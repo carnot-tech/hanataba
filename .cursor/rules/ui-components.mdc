@@ -1,0 +1,25 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# UI Components and Styling
+
+The application uses Shadcn/ui for pre-built components and styling.
+
+## Component System
+
+- UI components are configured through [components.json](mdc:components.json)
+- Base components are located in the components directory
+- Components follow the Shadcn/ui styling conventions using Tailwind CSS
+
+## Key UI Components
+
+- [components/ui/button.tsx](mdc:components/ui/button.tsx): Button component used throughout the application
+- Additional UI components can be added using the Shadcn/ui CLI
+
+## Styling
+
+- Tailwind CSS is used for styling
+- PostCSS configuration in [postcss.config.mjs](mdc:postcss.config.mjs)
+- Components use consistent theming and styling patterns from Shadcn/ui

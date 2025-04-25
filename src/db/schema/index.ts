@@ -1,4 +1,11 @@
 import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { createSchemaFactory } from "drizzle-zod";
+
+const { createSelectSchema } = createSchemaFactory({
+	coerce: {
+		date: true,
+	},
+});
 
 export const usersTable = pgTable("users", {
 	id: text("id").primaryKey(),
@@ -9,6 +16,8 @@ export const usersTable = pgTable("users", {
 	createdAt: timestamp("created_at").notNull(),
 	updatedAt: timestamp("updated_at").notNull(),
 });
+
+export const userSelectSchema = createSelectSchema(usersTable);
 
 export const sessionsTable = pgTable("sessions", {
 	id: text("id").primaryKey(),

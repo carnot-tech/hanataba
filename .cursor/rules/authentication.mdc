@@ -1,0 +1,26 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Authentication System
+
+The application uses a social authentication system with GitHub as a provider.
+
+## Key Components
+
+- [app/page.tsx](mdc:src/app/page.tsx): Contains the sign-in button and user data display
+- Authentication is handled through the auth client in [lib/auth-client.ts](mdc:src/lib/auth-client.ts)
+- User data is fetched using the API client in [lib/client.ts](mdc:src/lib/client.ts)
+
+## Authentication Flow
+
+1. User clicks the "Sign in" button which triggers the GitHub OAuth flow
+2. After successful authentication, user data can be fetched using the "Get me" endpoint
+3. User information is stored in React state and displayed on the page
+
+## API Integration
+
+The application uses a typed API client for making authenticated requests to the backend:
+- GET `/api/v1/users/me`: Fetches the current user's information
+- Authentication state is managed through the `authClient` utility
