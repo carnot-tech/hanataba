@@ -96,6 +96,7 @@ const handler: RouteHandler<
     createdAt: new Date(),
     updatedAt: new Date(),
   }).returning();
+  // FIXME: use real options
   const result = await tool.execute(valid.parameters, {
     toolCallId: "123",
     messages: [],

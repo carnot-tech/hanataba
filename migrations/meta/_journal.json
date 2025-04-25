@@ -29,6 +29,13 @@
       "when": 1745597358822,
       "tag": "0003_friendly_gateway",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1745598152232,
+      "tag": "0004_sparkling_the_fury",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { createMiddleware } from "hono/factory";
+import { db } from "@/db/drizzle";
 
 export type AuthVariables = {
 	user: typeof auth.$Infer.Session.user | null;

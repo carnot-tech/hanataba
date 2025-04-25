@@ -13,6 +13,15 @@ export default function Page() {
 		});
 	};
 
+	const onSignInEmail = async () => {
+		await authClient.signUp.email({
+			email: "test@example.com",
+			password: "password1234",
+			name: "test",
+			image: "https://example.com/image.png",
+		});
+	};
+
 	const onGetMe = async () => {
 		const res = await client.api.v1.users.me.$get();
 		if (res.ok) {
@@ -24,6 +33,7 @@ export default function Page() {
 	return (
 		<div>
 			<Button onClick={onSignIn}>Sign in</Button>
+			<Button onClick={onSignInEmail}>Sign in email</Button>
 			<Button onClick={onGetMe}>Get me</Button>
 			{user && <div>{JSON.stringify(user)}</div>}
 		</div>

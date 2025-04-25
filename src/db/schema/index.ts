@@ -1,12 +1,49 @@
-import { pgTable, text, timestamp, pgEnum, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, pgEnum, jsonb, varchar } from "drizzle-orm/pg-core";
 import { usersTable } from "./better-auth";
 import { createSchemaFactory } from "drizzle-zod";
+import { relations } from "drizzle-orm";
 
 const { createSelectSchema, createInsertSchema, createUpdateSchema } = createSchemaFactory({
 	coerce: {
 		date: true,
 	},
 });
+
+export const workspacesTable = pgTable("workspaces", {
+  id: text("id").primaryKey(),
+  name: varchar("name", { length: 256 }).notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+export const workspaceSelectSchema = createSelectSchema(workspacesTable);
+export const workspaceInsertSchema = createInsertSchema(workspacesTable);
+export const workspaceUpdateSchema = createUpdateSchema(workspacesTable);
+export const workspacesRelations = relations(workspacesTable, ({ many }) => ({
+  memberships: many(membershipsTable),
+}));
+
+export const membershipRoleEnum = pgEnum("membership_role", ["owner", "member"]);
+export const membershipsTable = pgTable("memberships", {
+  id: text("id").primaryKey(),
+  workspaceId: text("workspace_id").references(() => workspacesTable.id, { onDelete: "cascade" }).notNull(),
+  userId: text("user_id").references(() => usersTable.id).notNull(),
+  role: membershipRoleEnum("role").notNull().default("member"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+export const membershipSelectSchema = createSelectSchema(membershipsTable);
+export const membershipInsertSchema = createInsertSchema(membershipsTable);
+export const membershipUpdateSchema = createUpdateSchema(membershipsTable);
+export const membershipsRelations = relations(membershipsTable, ({ one }) => ({
+  workspace: one(workspacesTable, {
+    fields: [membershipsTable.workspaceId],
+    references: [workspacesTable.id],
+  }),
+  user: one(usersTable, {
+    fields: [membershipsTable.userId],
+    references: [usersTable.id],
+  }),
+}));
 
 export const mcpServerTypes = pgEnum("mcp_server_types", ["stdio", "sse"]);
 export const mcpServersTable = pgTable("mcp_servers", {
