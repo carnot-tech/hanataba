@@ -1,0 +1,26 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Project Structure Guide
+
+This is a Next.js project using TypeScript, Drizzle ORM, and Tailwind CSS.
+
+## Core Directories
+
+- `src/app/`: Contains the Next.js application routes and pages
+- `src/components/`: Reusable React components
+- `src/db/`: Database schema and configurations using Drizzle ORM
+- `src/lib/`: Utility functions and shared code
+
+## Key Configuration Files
+
+- [next.config.ts](mdc:next.config.ts): Next.js configuration
+- [drizzle.config.ts](mdc:drizzle.config.ts): Drizzle ORM configuration
+- [components.json](mdc:components.json): Shadcn UI components configuration
+- [tsconfig.json](mdc:tsconfig.json): TypeScript configuration
+
+## Database
+
+The project uses Drizzle ORM with migrations stored in the `migrations/` directory. Database schema and configurations can be found in `src/db/`.

@@ -1,0 +1,30 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Development Guidelines
+
+## Code Organization
+
+1. Place new components in `src/components/`
+2. Add new pages and routes in `src/app/`
+3. Keep utility functions in `src/lib/`
+4. Database schema changes should be made in `src/db/schema`
+
+## Best Practices
+
+1. Use TypeScript for type safety
+2. Follow the component structure from shadcn/ui
+3. Use Tailwind CSS for styling
+4. Create database migrations for schema changes
+
+## Dependencies
+
+The project uses:
+- Next.js for the framework
+- Drizzle for database ORM
+- Tailwind CSS for styling
+- shadcn/ui for UI components
+
+See [package.json](mdc:package.json) for the complete list of dependencies.
