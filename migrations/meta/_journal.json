@@ -8,6 +8,13 @@
       "when": 1745558144425,
       "tag": "0000_cool_thundra",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1745559111509,
+      "tag": "0001_steady_vivisector",
+      "breakpoints": true
     }
   ]
 }

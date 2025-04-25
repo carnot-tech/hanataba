@@ -9,8 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hono/node-server": "^1.14.1",
     "@hono/zod-openapi": "^0.19.5",
     "@radix-ui/react-slot": "^1.2.0",
+    "better-auth": "^1.2.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^16.5.0",
