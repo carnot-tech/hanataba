@@ -1,60 +1,46 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, pgEnum, jsonb } from "drizzle-orm/pg-core";
+import { usersTable } from "./better-auth";
 import { createSchemaFactory } from "drizzle-zod";
 
-const { createSelectSchema } = createSchemaFactory({
+const { createSelectSchema, createInsertSchema, createUpdateSchema } = createSchemaFactory({
 	coerce: {
 		date: true,
 	},
 });
 
-export const usersTable = pgTable("users", {
-	id: text("id").primaryKey(),
-	name: text("name").notNull(),
-	email: text("email").notNull().unique(),
-	emailVerified: boolean("email_verified").notNull(),
-	image: text("image"),
-	createdAt: timestamp("created_at").notNull(),
-	updatedAt: timestamp("updated_at").notNull(),
+export const mcpServerTypes = pgEnum("mcp_server_types", ["stdio", "sse"]);
+export const mcpServersTable = pgTable("mcp_servers", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").references(() => usersTable.id).notNull(),
+  name: text("name").notNull(),
+  description: text("description").notNull().default(""),
+  type: mcpServerTypes("type").notNull(),
+  url: text("url"),
+  headers: jsonb("headers"),
+  command: text("command"),
+  args: text("args"),
+  env: jsonb("env"),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
 });
+export const mcpServerSelectSchema = createSelectSchema(mcpServersTable);
+export const mcpServerInsertSchema = createInsertSchema(mcpServersTable);
+export const mcpServerUpdateSchema = createUpdateSchema(mcpServersTable);
 
-export const userSelectSchema = createSelectSchema(usersTable);
-
-export const sessionsTable = pgTable("sessions", {
-	id: text("id").primaryKey(),
-	expiresAt: timestamp("expires_at").notNull(),
-	token: text("token").notNull().unique(),
-	createdAt: timestamp("created_at").notNull(),
-	updatedAt: timestamp("updated_at").notNull(),
-	ipAddress: text("ip_address"),
-	userAgent: text("user_agent"),
-	userId: text("user_id")
-		.notNull()
-		.references(() => usersTable.id, { onDelete: "cascade" }),
+export const mcpRunStatusEnum = pgEnum("mcp_run_status", ["running", "success", "error"]);
+export const mcpRunsTable = pgTable("mcp_runs", {
+  id: text("id").primaryKey(),
+  mcpId: text("mcp_id").references(() => mcpServersTable.id).notNull(),
+  toolId: text("tool_id").notNull(),
+  status: mcpRunStatusEnum("status").notNull(),
+  parameters: jsonb("parameters").notNull(),
+  result: jsonb("result"),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
 });
+export const mcpRunSelectSchema = createSelectSchema(mcpRunsTable);
+export const mcpRunInsertSchema = createInsertSchema(mcpRunsTable);
+export const mcpRunUpdateSchema = createUpdateSchema(mcpRunsTable);
 
-export const accountsTable = pgTable("accounts", {
-	id: text("id").primaryKey(),
-	accountId: text("account_id").notNull(),
-	providerId: text("provider_id").notNull(),
-	userId: text("user_id")
-		.notNull()
-		.references(() => usersTable.id, { onDelete: "cascade" }),
-	accessToken: text("access_token"),
-	refreshToken: text("refresh_token"),
-	idToken: text("id_token"),
-	accessTokenExpiresAt: timestamp("access_token_expires_at"),
-	refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
-	scope: text("scope"),
-	password: text("password"),
-	createdAt: timestamp("created_at").notNull(),
-	updatedAt: timestamp("updated_at").notNull(),
-});
+export * from "./better-auth";
 
-export const verificationsTable = pgTable("verifications", {
-	id: text("id").primaryKey(),
-	identifier: text("identifier").notNull(),
-	value: text("value").notNull(),
-	expiresAt: timestamp("expires_at").notNull(),
-	createdAt: timestamp("created_at"),
-	updatedAt: timestamp("updated_at"),
-});

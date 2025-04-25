@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
-import { client, type UserType } from "@/lib/client";
+import { client, type UserType } from "@/lib/api-client";
 import { useState } from "react";
 
 export default function Page() {

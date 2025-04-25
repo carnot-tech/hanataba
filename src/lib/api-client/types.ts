@@ -1,0 +1,18 @@
+import type { InferResponseType, InferRequestType } from "hono/client";
+import type { ClientType } from "./index";
+
+export type UserType = InferResponseType<
+	ClientType["api"]["v1"]["users"]["me"]["$get"],
+	200
+>;
+
+
+export type MCPServerType = InferRequestType<
+	ClientType["api"]["v1"]["mcps"]["$post"]
+>["json"];
+
+export type MCPServersType = InferResponseType<
+	ClientType["api"]["v1"]["mcps"]["$get"],
+	200
+>;
+
