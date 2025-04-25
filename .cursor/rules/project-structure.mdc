@@ -3,9 +3,37 @@ description:
 globs: 
 alwaysApply: false
 ---
-# Project Structure Guide
+# Project Structure Guidelines
 
-This is a Next.js project using TypeScript, Drizzle ORM, and Tailwind CSS.
+## Directory Structure
+```
+src/
+├── app/           # Next.js アプリケーションルート
+├── components/    # Reactコンポーネント
+│   ├── ui/       # 再利用可能なUIコンポーネント
+│   └── {feature} # 機能別コンポーネント
+├── lib/          # ユーティリティ関数、ヘルパー
+└── styles/       # グローバルスタイル
+```
+
+## Component Organization
+- `ui/`: shadcn/ui コンポーネントとカスタムUIコンポーネント
+- `{feature}/`: 機能別のコンポーネント（例: home, auth, dashboard）
+
+## File Naming
+- コンポーネントファイル: `PascalCase.tsx`
+- ユーティリティファイル: `kebab-case.ts`
+- インデックスファイル: `index.tsx`
+
+## Import Rules
+- 相対パスではなく `@/` エイリアスを使用
+- コンポーネントは名前付きエクスポートを推奨
+- 型定義は同じファイル内に配置
+
+## Dependencies
+- UI コンポーネント: shadcn/ui
+- スタイリング: Tailwind CSS
+- ルーティング: Next.js App Router
 
 ## Core Directories
 

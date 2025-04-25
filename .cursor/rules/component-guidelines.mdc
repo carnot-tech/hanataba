@@ -1,0 +1,42 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Component Implementation Guidelines
+
+## UI Components
+- UIコンポーネントは `src/components/ui` ディレクトリに配置
+- 基本的なUIコンポーネントは shadcn/ui を使用
+- カスタムコンポーネントを作成する場合も shadcn/ui のスタイルガイドに従う
+- 例: [src/components/ui/card.tsx](mdc:src/components/ui/card.tsx)
+
+## Page Components
+- ページコンポーネントは `src/components/{feature-name}` ディレクトリに配置
+- 例: [src/components/home/index.tsx](mdc:src/components/home/index.tsx)
+
+## Component Structure
+1. 必要な依存関係のインポート
+   - UIコンポーネント
+   - 型定義
+   - ユーティリティ関数
+2. コンポーネントの実装
+   - Props の型定義
+   - 適切な命名規則
+   - コンポーネントのロジック
+3. スタイリング
+   - Tailwind CSS を使用
+   - shadcn/ui のユーティリティクラスを活用
+
+## Best Practices
+- コンポーネントは単一責任の原則に従う
+- Props の型は明示的に定義
+- 再利用可能なコンポーネントは UI ディレクトリに配置
+- アクセシビリティを考慮したマークアップ
+- レスポンシブデザインの実装
+
+## Installation
+新しい shadcn/ui コンポーネントの追加:
+```bash
+npx shadcn@latest add {component-name}
+```

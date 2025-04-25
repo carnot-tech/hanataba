@@ -16,3 +16,7 @@ export type MCPServersType = InferResponseType<
 	200
 >;
 
+export type WorkspaceType = InferResponseType<
+	ClientType["api"]["v1"]["workspaces"]["$get"],
+	200
+>[number];
