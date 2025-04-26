@@ -1,0 +1,50 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# API Development Guide
+
+## Route Structure
+
+API routes are organized under `src/app/api/[[...route]]/v1/` following REST principles.
+
+### Example Route
+[list.ts](mdc:src/app/api/[[...route]]/v1/mcps/list.ts) demonstrates the standard API route pattern:
+- Uses Hono's OpenAPI integration with Zod for type-safe routes
+- Implements proper authentication and authorization checks
+- Returns appropriate HTTP status codes
+- Uses proper TypeScript types for request/response handling
+
+## Best Practices
+
+1. Route Definition:
+   ```typescript
+   const route = createRoute({
+     method: "get",
+     path: "/",
+     request: {
+       query: z.object({
+         // Define query parameters with Zod
+       })
+     },
+     responses: {
+       // Document all possible response types
+     }
+   });
+   ```
+
+2. Authentication:
+   - Always check `user` object from auth middleware
+   - Return 401 for unauthenticated requests
+   - Implement proper authorization checks using domain policies
+
+3. Error Handling:
+   - Use appropriate HTTP status codes
+   - Return consistent error response format
+   - Include helpful error messages
+
+4. Database Operations:
+   - Use Drizzle ORM for type-safe queries
+   - Implement proper pagination with limit/offset
+   - Add appropriate where clauses for data isolation

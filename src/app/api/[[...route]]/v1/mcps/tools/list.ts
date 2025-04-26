@@ -11,9 +11,7 @@ const toolSchema = z.object({
   parameters: z.record(z.string(), z.any()),
 });
 
-const outputSchema = z.object({
-  tools: z.array(toolSchema),
-});
+const outputSchema = z.array(toolSchema);
 
 const route = createRoute({
 	method: "get",
@@ -56,14 +54,18 @@ const handler: RouteHandler<typeof route, {
     mcp.type === "sse"
       ? {
           type: "sse",
+          name: mcp.name,
+          description: mcp.description,
           url: mcp.url ?? "",
           headers: JSON.parse(mcp.headers as string),
         }
       : {
           type: "stdio",
+          name: mcp.name,
+          description: mcp.description,
           command: mcp.command ?? "",
           args: JSON.parse(mcp.args as string),
-          env: JSON.parse(mcp.env as string),
+          env: mcp.env as Record<string, string>,
         }
   );
   return c.json(Object.entries(tools).map(([key, value]) => ({

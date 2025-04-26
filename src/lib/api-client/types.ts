@@ -6,17 +6,21 @@ export type UserType = InferResponseType<
 	200
 >;
 
-
-export type MCPServerType = InferRequestType<
+export type MCPServerInsertType = InferRequestType<
 	ClientType["api"]["v1"]["mcps"]["$post"]
 >["json"];
 
 export type MCPServersType = InferResponseType<
 	ClientType["api"]["v1"]["mcps"]["$get"],
 	200
->;
+>[number];
 
 export type WorkspaceType = InferResponseType<
 	ClientType["api"]["v1"]["workspaces"]["$get"],
+	200
+>[number];
+
+export type ToolType = InferResponseType<
+	ClientType["api"]["v1"]["mcps"][":mcpId"]["tools"]["$get"],
 	200
 >[number];

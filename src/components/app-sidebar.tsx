@@ -2,9 +2,6 @@
 
 import * as React from "react"
 import {
-  AudioWaveform,
-  Command,
-  GalleryVerticalEnd,
   Home,
   ListCheck as Runs,
   Blocks as MCPs,
@@ -25,23 +22,6 @@ import type { User } from "better-auth"
 import { client, type WorkspaceType } from "@/lib/api-client"
 
 const data = {
-  workspaces: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
   navMain: [
     {
       title: "Home",
@@ -49,14 +29,14 @@ const data = {
       icon: Home,
     },
     {
-      title: "Runs",
-      url: "/dashboard/runs",
-      icon: Runs,
-    },
-    {
       title: "MCPs",
       url: "/dashboard/mcps",
       icon: MCPs,
+    },
+    {
+      title: "Runs",
+      url: "/dashboard/runs",
+      icon: Runs,
     }
   ],
 }

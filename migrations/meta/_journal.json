@@ -36,6 +36,13 @@
       "when": 1745598152232,
       "tag": "0004_sparkling_the_fury",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1745613386333,
+      "tag": "0005_simple_payback",
+      "breakpoints": true
     }
   ]
 }

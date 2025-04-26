@@ -1,0 +1,2 @@
+ALTER TABLE "mcp_servers" ADD COLUMN "workspace_id" text NOT NULL;--> statement-breakpoint
+ALTER TABLE "mcp_servers" ADD CONSTRAINT "mcp_servers_workspace_id_workspaces_id_fk" FOREIGN KEY ("workspace_id") REFERENCES "public"."workspaces"("id") ON DELETE no action ON UPDATE no action;

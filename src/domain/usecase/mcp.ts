@@ -3,12 +3,16 @@ import { Experimental_StdioMCPTransport as StdioMCPTransport } from "ai/mcp-stdi
 
 export type SSEMCPServer = {
   type: 'sse';
+  name: string;
+  description: string;
   url: string;
   headers?: Record<string, string>;
 }
 
 export type StdioMCPServer = {
   type: 'stdio';
+  name: string;
+  description: string;
   command: string;
   args: string[];
   env?: Record<string, string>;

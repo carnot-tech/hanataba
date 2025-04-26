@@ -56,10 +56,10 @@ const handler: RouteHandler<
   const raw = await c.req.json();
 	const valid = inputSchema.parse(raw);
 
-  // const user = c.get("user");
-  // if (!user) {
-  //   return c.json({ error: "Unauthorized" }, 401);
-  // }
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
 
   const mcp = await db.query.mcpServersTable.findFirst({
     where: eq(mcpServersTable.id, mcpId),
@@ -72,14 +72,18 @@ const handler: RouteHandler<
     mcp.type === "sse"
       ? {
           type: "sse",
+          name: mcp.name,
+          description: mcp.description,
           url: mcp.url ?? "",
           headers: JSON.parse(mcp.headers as string),
         }
       : {
           type: "stdio",
+          name: mcp.name,
+          description: mcp.description,
           command: mcp.command ?? "",
           args: JSON.parse(mcp.args as string),
-          env: JSON.parse(mcp.env as string),
+          env: mcp.env as Record<string, string>,
         }
   );
   const tool = tools[valid.toolId];
