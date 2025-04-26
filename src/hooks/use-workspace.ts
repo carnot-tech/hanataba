@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react';
-import { client, type WorkspaceType } from '@/lib/api-client';
+import { client } from '@/lib/api-client';
 
 const ACTIVE_WORKSPACE_KEY = 'active_workspace';
 
+interface Workspace {
+  id: string;
+  name: string;
+  accessToken: string;
+}
+
 export const useWorkspace = () => {
-  const [activeWorkspace, setActiveWorkspace] = useState<WorkspaceType | null>(null);
+  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -22,7 +28,7 @@ export const useWorkspace = () => {
           if (response.status !== 200) {
             return;
           }
-          const workspaces = await response.json();
+          const workspaces = (await response.json() as unknown) as Workspace[];
           if (workspaces.length > 0) {
             setWorkspace(workspaces[0]);
           }
@@ -37,7 +43,7 @@ export const useWorkspace = () => {
     initializeWorkspace();
   }, []);
 
-  const setWorkspace = (workspace: WorkspaceType) => {
+  const setWorkspace = (workspace: Workspace) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem(ACTIVE_WORKSPACE_KEY, JSON.stringify(workspace));
     }
@@ -51,10 +57,31 @@ export const useWorkspace = () => {
     setActiveWorkspace(null);
   };
 
+  const deleteWorkspace = async (workspaceId: string) => {
+    try {
+      const response = await client.api.v1.workspaces[":id"].$delete({
+        param: { id: workspaceId },
+      });
+      
+      if (response.status !== 200) {
+        throw new Error('Failed to delete workspace');
+      }
+
+      if (activeWorkspace?.id === workspaceId) {
+        clearWorkspace();
+      }
+      return true;
+    } catch (error) {
+      console.error('Failed to delete workspace:', error);
+      return false;
+    }
+  };
+
   return {
     activeWorkspace,
     setWorkspace,
     clearWorkspace,
+    deleteWorkspace,
     isLoading,
   };
 };
