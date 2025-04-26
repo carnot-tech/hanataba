@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Globe, Terminal, Trash2, Wrench, Play, Loader2 } from "lucide-react";
+import { Globe, Terminal, Trash2, Wrench, Play, Loader2, Pencil, ChevronDown } from "lucide-react";
 import type { MCPServersType, MCPToolType } from "@/lib/api-client/types";
 import { client } from "@/lib/api-client";
 import {
@@ -44,12 +44,16 @@ export default function MCPServerDetailPage() {
   const router = useRouter();
   const [server, setServer] = useState<MCPServersType | null>(null);
   const [tools, setTools] = useState<MCPToolType[]>([]);
+  const [isLoadingTools, setIsLoadingTools] = useState(false);
   const [selectedTool, setSelectedTool] = useState<MCPToolType | null>(null);
   const [isExecuteModalOpen, setIsExecuteModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editForm, setEditForm] = useState<Partial<MCPServersType>>({});
   const [parameters, setParameters] = useState<Record<string, string>>({});
   const [isExecuting, setIsExecuting] = useState(false);
   const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null);
   const [executionError, setExecutionError] = useState<string | null>(null);
+  const [showEnvVars, setShowEnvVars] = useState(false);
 
   useEffect(() => {
     const fetchServer = async () => {
@@ -68,14 +72,19 @@ export default function MCPServerDetailPage() {
 
   useEffect(() => {
     const fetchTools = async () => {
-      const response = await client.api.v1.mcps[":mcpId"].tools.$get({
-        param: {
-          mcpId: params.id as string,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setTools(data);
+      setIsLoadingTools(true);
+      try {
+        const response = await client.api.v1.mcps[":mcpId"].tools.$get({
+          param: {
+            mcpId: params.id as string,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setTools(data);
+        }
+      } finally {
+        setIsLoadingTools(false);
       }
     };
     fetchTools();
@@ -171,6 +180,27 @@ export default function MCPServerDetailPage() {
     setExecutionError(null);
   };
 
+  const handleEdit = async () => {
+    if (!server) return;
+    
+    const response = await client.api.v1.mcps[":id"].$put({
+      param: {
+        id: params.id as string,
+      },
+      json: {
+        ...server,
+        ...editForm,
+      },
+    });
+    
+    if (response.ok) {
+      const updatedServer = await response.json();
+      setServer(updatedServer);
+      setIsEditModalOpen(false);
+      setEditForm({});
+    }
+  };
+
   if (!server) {
     return <div>Loading...</div>;
   }
@@ -182,10 +212,19 @@ export default function MCPServerDetailPage() {
           <h1 className="text-2xl font-bold">{server.name}</h1>
           <p className="text-muted-foreground">{server.description}</p>
         </div>
-        <Button variant="ghost" className="text-destructive hover:text-destructive" onClick={handleDelete}>
-          <Trash2 className="w-4 h-4 mr-2" />
-          Delete Server
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="ghost" onClick={() => {
+            setEditForm(server);
+            setIsEditModalOpen(true);
+          }}>
+            <Pencil className="w-4 h-4 mr-2" />
+            Edit
+          </Button>
+          <Button variant="ghost" className="text-destructive hover:text-destructive" onClick={handleDelete}>
+            <Trash2 className="w-4 h-4 mr-2" />
+            Delete
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -229,10 +268,25 @@ export default function MCPServerDetailPage() {
                   </pre>
                 </div>
                 <div>
-                  <h3 className="font-medium">Environment Variables</h3>
-                  <pre className="text-sm bg-muted/40 p-2 overflow-x-auto max-h-[200px] overflow-y-auto whitespace-pre-wrap break-all">
-                    {typeof server.env === 'string' ? server.env : JSON.stringify(server.env, null, 2)}
-                  </pre>
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium">Environment Variables</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowEnvVars(!showEnvVars)}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <ChevronDown className={`w-4 h-4 mr-1 transition-transform ${showEnvVars ? 'rotate-180' : ''}`} />
+                      {showEnvVars ? "Hide" : "Show"}
+                    </Button>
+                  </div>
+                  {showEnvVars && (
+                    <div className="mt-2">
+                      <pre className="text-sm bg-muted/40 p-3 rounded-md overflow-x-auto max-h-[200px] overflow-y-auto whitespace-pre-wrap break-all border border-muted">
+                        {typeof server.env === 'string' ? server.env : JSON.stringify(server.env, null, 2)}
+                      </pre>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -275,7 +329,12 @@ export default function MCPServerDetailPage() {
         </CardHeader>
         <CardContent className="p-4">
           <div className="space-y-4">
-            {tools.length === 0 ? (
+            {isLoadingTools ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <span className="ml-2">Loading tools...</span>
+              </div>
+            ) : tools.length === 0 ? (
               <p className="text-sm text-muted-foreground">No tools available</p>
             ) : (
               tools.map((tool) => (
@@ -380,6 +439,94 @@ export default function MCPServerDetailPage() {
                 </Button>
               </>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="border rounded-lg bg-background">
+          <DialogHeader>
+            <DialogTitle>Edit Server</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                value={editForm.name || ''}
+                onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Enter server name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Input
+                id="description"
+                value={editForm.description || ''}
+                onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Enter server description"
+              />
+            </div>
+            {server?.type === "sse" ? (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="url">URL</Label>
+                  <Input
+                    id="url"
+                    value={editForm.url || ''}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, url: e.target.value }))}
+                    placeholder="Enter server URL"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="headers">Headers</Label>
+                  <Input
+                    id="headers"
+                    value={typeof editForm.headers === 'string' ? editForm.headers : JSON.stringify(editForm.headers || {})}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, headers: e.target.value }))}
+                    placeholder="Enter headers as JSON"
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="command">Command</Label>
+                  <Input
+                    id="command"
+                    value={editForm.command || ''}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, command: e.target.value }))}
+                    placeholder="Enter command"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="args">Arguments</Label>
+                  <Input
+                    id="args"
+                    value={typeof editForm.args === 'string' ? editForm.args : JSON.stringify(editForm.args || [])}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, args: e.target.value }))}
+                    placeholder="Enter arguments as JSON array"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="env">Environment Variables</Label>
+                  <Input
+                    id="env"
+                    value={typeof editForm.env === 'string' ? editForm.env : JSON.stringify(editForm.env || {})}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, env: e.target.value }))}
+                    placeholder="Enter environment variables as JSON"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setIsEditModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="ghost" onClick={handleEdit}>
+              Save Changes
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

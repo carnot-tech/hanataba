@@ -2,7 +2,7 @@ import { createRoute, type RouteHandler } from "@hono/zod-openapi";
 import { db } from "@/db/drizzle";
 import type { AuthVariables } from "@/app/api/[[...route]]/middleware/auth";
 import { mcpRunSelectSchema, mcpRunsTable, mcpServersTable } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { WorkspacePolicy } from "@/domain/policy/workspace";
 
@@ -63,6 +63,7 @@ const handler: RouteHandler<
 				where: eq(mcpServersTable.workspaceId, workspaceId),
 			},
 		},
+		orderBy: desc(mcpRunsTable.createdAt),
 	});
 	return c.json(mcps, 200);
 };

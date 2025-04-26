@@ -100,7 +100,7 @@ export const mcpRunStatusEnum = pgEnum("mcp_run_status", [
 export const mcpRunsTable = pgTable("mcp_runs", {
 	id: text("id").primaryKey(),
 	mcpId: text("mcp_id")
-		.references(() => mcpServersTable.id)
+		.references(() => mcpServersTable.id, { onDelete: "cascade" })
 		.notNull(),
 	toolId: text("tool_id").notNull(),
 	status: mcpRunStatusEnum("status").notNull(),

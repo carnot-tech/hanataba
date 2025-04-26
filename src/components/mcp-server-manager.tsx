@@ -14,6 +14,12 @@ import {
 import { Plus, X } from "lucide-react";
 import type { MCPServerInsertType } from "@/lib/api-client/types";
 import { useWorkspace } from "@/hooks/use-workspace";
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface MCPServerManagerProps {
 	isOpen: boolean;
@@ -41,6 +47,12 @@ interface StdioServerForm {
 interface KeyValuePair {
 	key: string;
 	value: string;
+}
+
+interface StdioServerConfig {
+	command: string;
+	args: string[];
+	env: Record<string, string>;
 }
 
 const initialSSEServer: SSEServerForm = {
@@ -74,6 +86,7 @@ export function MCPServerManager({
 	});
 	const [newArg, setNewArg] = useState("");
 	const [newEnv, setNewEnv] = useState<KeyValuePair>({ key: "", value: "" });
+	const [jsonInput, setJsonInput] = useState("");
 
 	const resetForms = () => {
 		setSseServer(initialSSEServer);
@@ -81,6 +94,7 @@ export function MCPServerManager({
 		setNewHeader({ key: "", value: "" });
 		setNewArg("");
 		setNewEnv({ key: "", value: "" });
+		setJsonInput("");
 	};
 
 	const handleAddServer = () => {
@@ -227,144 +241,222 @@ export function MCPServerManager({
 		</div>
 	);
 
-	const renderStdioForm = () => (
-		<div className="space-y-4">
-			<div className="space-y-2">
-				<Label htmlFor="name">Name</Label>
-				<Input
-					id="name"
-					value={stdioServer.name}
-					onChange={(e) =>
-						setStdioServer({ ...stdioServer, name: e.target.value })
-					}
-					placeholder="My Stdio Server"
-				/>
-			</div>
-			<div className="space-y-2">
-				<Label htmlFor="description">Description</Label>
-				<Input
-					id="description"
-					value={stdioServer.description}
-					onChange={(e) =>
-						setStdioServer({ ...stdioServer, description: e.target.value })
-					}
-					placeholder="Description of the server"
-				/>
-			</div>
-			<div className="space-y-2">
-				<Label htmlFor="command">Command</Label>
-				<Input
-					id="command"
-					value={stdioServer.command}
-					onChange={(e) =>
-						setStdioServer({ ...stdioServer, command: e.target.value })
-					}
-					placeholder="python"
-				/>
-			</div>
-			<div className="space-y-2">
-				<Label>Arguments</Label>
-				<div className="flex gap-2">
+	const renderStdioForm = () => {
+		const handleJsonChange = (jsonStr: string) => {
+			setJsonInput(jsonStr);
+			try {
+				const config = JSON.parse(jsonStr) as Partial<StdioServerConfig>;
+				setStdioServer({
+					...stdioServer,
+					command: config.command ?? "",
+					args: Array.isArray(config.args) ? config.args : [],
+					env: typeof config.env === 'object' && config.env !== null ? config.env : {}
+				});
+			} catch {
+				// Invalid JSON, keep the input but don't update the form
+			}
+		};
+
+		const handleIndividualChange = <T extends keyof StdioServerForm>(
+			field: T,
+			value: StdioServerForm[T]
+		) => {
+			const updatedServer = { ...stdioServer, [field]: value };
+			setStdioServer(updatedServer);
+			// Update JSON input when individual fields change
+			setJsonInput(JSON.stringify({
+				command: updatedServer.command,
+				args: updatedServer.args,
+				env: updatedServer.env
+			}, null, 2));
+		};
+
+		const validateServerConfig = (): boolean => {
+			if (!stdioServer.command) {
+				return false;
+			}
+			if (!Array.isArray(stdioServer.args)) {
+				return false;
+			}
+			if (typeof stdioServer.env !== 'object' || stdioServer.env === null) {
+				return false;
+			}
+			return true;
+		};
+
+		const handleAddArgument = () => {
+			if (!newArg) return;
+			handleIndividualChange('args', [...stdioServer.args, newArg]);
+			setNewArg("");
+		};
+
+		const handleRemoveArgument = (arg: string) => {
+			handleIndividualChange('args', stdioServer.args.filter((a) => a !== arg));
+		};
+
+		const handleAddEnvironment = () => {
+			if (!newEnv.key) return;
+			handleIndividualChange('env', { ...stdioServer.env, [newEnv.key]: newEnv.value });
+			setNewEnv({ key: "", value: "" });
+		};
+
+		const handleRemoveEnvironment = (key: string) => {
+			const newEnv = { ...stdioServer.env };
+			delete newEnv[key];
+			handleIndividualChange('env', newEnv);
+		};
+
+		return (
+			<div className="space-y-4">
+				<div className="space-y-2">
+					<Label htmlFor="name">Name</Label>
 					<Input
-						value={newArg}
-						onChange={(e) => setNewArg(e.target.value)}
-						placeholder="Argument"
+						id="name"
+						value={stdioServer.name}
+						onChange={(e) => handleIndividualChange('name', e.target.value)}
+						placeholder="My Stdio Server"
 					/>
+				</div>
+				<div className="space-y-2">
+					<Label htmlFor="description">Description</Label>
+					<Input
+						id="description"
+						value={stdioServer.description}
+						onChange={(e) => handleIndividualChange('description', e.target.value)}
+						placeholder="Description of the server"
+					/>
+				</div>
+				<div className="space-y-2">
+					<Label>Configuration (JSON)</Label>
+					<textarea
+						className="w-full h-32 p-2 border rounded-md font-mono text-sm"
+						value={jsonInput}
+						onChange={(e) => handleJsonChange(e.target.value)}
+						placeholder={`{
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-slack"],
+  "env": {
+    "SLACK_BOT_TOKEN": "xoxb-your-bot-token",
+    "SLACK_TEAM_ID": "T01234567",
+    "SLACK_CHANNEL_IDS": "C01234567, C76543210"
+  }
+}`}
+					/>
+				</div>
+				<Accordion type="single" collapsible className="w-full">
+					<AccordionItem value="individual-fields">
+						<AccordionTrigger>Individual Fields</AccordionTrigger>
+						<AccordionContent>
+							<div className="space-y-4">
+								<div className="space-y-2">
+									<Label htmlFor="command">Command</Label>
+									<Input
+										id="command"
+										value={stdioServer.command}
+										onChange={(e) => handleIndividualChange('command', e.target.value)}
+										placeholder="python"
+									/>
+								</div>
+								<div className="space-y-2">
+									<Label>Arguments</Label>
+									<div className="flex gap-2">
+										<Input
+											value={newArg}
+											onChange={(e) => setNewArg(e.target.value)}
+											placeholder="Argument"
+										/>
+										<Button
+											type="button"
+											size="icon"
+											onClick={handleAddArgument}
+										>
+											<Plus className="h-4 w-4" />
+										</Button>
+									</div>
+									{stdioServer.args.length > 0 && (
+										<div className="space-y-2">
+											{stdioServer.args.map((arg) => (
+												<div key={`arg-${arg}`} className="flex items-center gap-2">
+													<span className="text-sm font-mono">{arg}</span>
+													<Button
+														type="button"
+														variant="ghost"
+														size="icon"
+														onClick={() => handleRemoveArgument(arg)}
+													>
+														<X className="h-3 w-3" />
+													</Button>
+												</div>
+											))}
+										</div>
+									)}
+								</div>
+								<div className="space-y-2">
+									<Label>Environment Variables</Label>
+									<div className="flex gap-2">
+										<Input
+											value={newEnv.key}
+											onChange={(e) => setNewEnv({ ...newEnv, key: e.target.value })}
+											placeholder="Key"
+										/>
+										<Input
+											value={newEnv.value}
+											onChange={(e) => setNewEnv({ ...newEnv, value: e.target.value })}
+											placeholder="Value"
+										/>
+										<Button
+											type="button"
+											size="icon"
+											onClick={handleAddEnvironment}
+										>
+											<Plus className="h-4 w-4" />
+										</Button>
+									</div>
+									{Object.entries(stdioServer.env).length > 0 && (
+										<div className="space-y-2">
+											{Object.entries(stdioServer.env).map(([key, value]) => (
+												<div key={`env-${key}`} className="flex items-center gap-2">
+													<span className="text-sm font-mono">{key}</span>
+													<span className="text-sm text-muted-foreground">=</span>
+													<span className="text-sm text-muted-foreground">{value}</span>
+													<Button
+														type="button"
+														variant="ghost"
+														size="icon"
+														onClick={() => handleRemoveEnvironment(key)}
+													>
+														<X className="h-3 w-3" />
+													</Button>
+												</div>
+											))}
+										</div>
+									)}
+								</div>
+							</div>
+						</AccordionContent>
+					</AccordionItem>
+				</Accordion>
+				<DialogFooter>
+					<Button type="button" variant="outline" onClick={onClose}>
+						Cancel
+					</Button>
 					<Button
 						type="button"
-						size="icon"
 						onClick={() => {
-							if (!newArg) return;
-							setStdioServer((prev) => ({
-								...prev,
-								args: [...prev.args, newArg],
-							}));
-							setNewArg("");
+							if (!validateServerConfig()) {
+								alert('Invalid server configuration. Please check your input.');
+								return;
+							}
+							handleAddServer();
 						}}
+						disabled={!stdioServer.name}
 					>
-						<Plus className="h-4 w-4" />
+						Add Server
 					</Button>
-				</div>
-				{stdioServer.args.length > 0 && (
-					<div className="space-y-2">
-						{stdioServer.args.map((arg) => (
-							<div key={`arg-${arg}`} className="flex items-center gap-2">
-								<span className="text-sm font-mono">{arg}</span>
-								<Button
-									type="button"
-									variant="ghost"
-									size="icon"
-									onClick={() => {
-										setStdioServer((prev) => ({
-											...prev,
-											args: prev.args.filter((a) => a !== arg),
-										}));
-									}}
-								>
-									<X className="h-3 w-3" />
-								</Button>
-							</div>
-						))}
-					</div>
-				)}
+				</DialogFooter>
 			</div>
-			<div className="space-y-2">
-				<Label>Environment Variables</Label>
-				<div className="flex gap-2">
-					<Input
-						value={newEnv.key}
-						onChange={(e) => setNewEnv({ ...newEnv, key: e.target.value })}
-						placeholder="Key"
-					/>
-					<Input
-						value={newEnv.value}
-						onChange={(e) => setNewEnv({ ...newEnv, value: e.target.value })}
-						placeholder="Value"
-					/>
-					<Button
-						type="button"
-						size="icon"
-						onClick={() => {
-							if (!newEnv.key) return;
-							setStdioServer((prev) => ({
-								...prev,
-								env: { ...prev.env, [newEnv.key]: newEnv.value },
-							}));
-							setNewEnv({ key: "", value: "" });
-						}}
-					>
-						<Plus className="h-4 w-4" />
-					</Button>
-				</div>
-				{Object.entries(stdioServer.env).length > 0 && (
-					<div className="space-y-2">
-						{Object.entries(stdioServer.env).map(([key, value]) => (
-							<div key={`env-${key}`} className="flex items-center gap-2">
-								<span className="text-sm font-mono">{key}</span>
-								<span className="text-sm text-muted-foreground">=</span>
-								<span className="text-sm text-muted-foreground">{value}</span>
-								<Button
-									type="button"
-									variant="ghost"
-									size="icon"
-									onClick={() => {
-										const newEnv = { ...stdioServer.env };
-										delete newEnv[key];
-										setStdioServer((prev) => ({
-											...prev,
-											env: newEnv,
-										}));
-									}}
-								>
-									<X className="h-3 w-3" />
-								</Button>
-							</div>
-						))}
-					</div>
-				)}
-			</div>
-		</div>
-	);
+		);
+	};
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
@@ -375,22 +467,6 @@ export function MCPServerManager({
 				<div className="space-y-4">
 					{renderServerTypeSelector()}
 					{serverType === "sse" ? renderSSEForm() : renderStdioForm()}
-					<DialogFooter>
-						<Button type="button" variant="outline" onClick={onClose}>
-							Cancel
-						</Button>
-						<Button
-							type="button"
-							onClick={handleAddServer}
-							disabled={
-								serverType === "sse"
-									? !sseServer.url || !sseServer.name
-									: !stdioServer.command || !stdioServer.name
-							}
-						>
-							Add Server
-						</Button>
-					</DialogFooter>
 				</div>
 			</DialogContent>
 		</Dialog>

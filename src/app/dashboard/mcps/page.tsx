@@ -56,7 +56,7 @@ export default function Page() {
         <h1 className="text-2xl font-bold text-foreground">MCPs</h1>
         <Button onClick={() => setIsModalOpen(true)} className="gap-2" variant="ghost">
           <PlusCircle className="h-4 w-4" />
-          Add MCP
+          Add
         </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

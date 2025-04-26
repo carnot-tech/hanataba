@@ -4,7 +4,11 @@ import { mcpServerSelectSchema, mcpServersTable, mcpServerUpdateSchema } from "@
 import { eq } from "drizzle-orm";
 import type { AuthVariables } from "@/app/api/[[...route]]/middleware/auth";
 
-const inputSchema = mcpServerUpdateSchema;
+const inputSchema = mcpServerUpdateSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 
 const outputSchema = mcpServerSelectSchema;
 
