@@ -9,6 +9,7 @@ import { useWorkspace } from "@/hooks/use-workspace";
 import { useRouter } from "next/navigation";
 import { Table, TableHeader, TableBody, TableCell, TableRow, TableHead } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 function useRuns() {
   const { activeWorkspace } = useWorkspace();
@@ -40,50 +41,62 @@ export default function Page() {
   const router = useRouter();
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-foreground">All Runs</h1>
-        <Button onClick={fetchRuns} disabled={loading} variant="ghost" className="gap-2">
-          <RefreshCw className="h-4 w-4" />
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-medium">Runs</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            View and manage your runs
+          </p>
+        </div>
+        <Button 
+          onClick={fetchRuns} 
+          disabled={loading} 
+          variant="outline" 
+          className="gap-1.5"
+        >
+          <RefreshCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
           Reload
         </Button>
       </div>
-      <div className="border rounded-lg bg-background">
+      <div className="border rounded-md bg-background">
         <Table>
           <TableHeader>
-            <TableRow className="hover:bg-muted/40">
-              <TableHead className="text-muted-foreground font-medium">ID</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Tool</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Status</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Started At</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Duration</TableHead>
+            <TableRow className="hover:bg-muted/20">
+              <TableHead className="text-xs text-muted-foreground font-medium">ID</TableHead>
+              <TableHead className="text-xs text-muted-foreground font-medium">Tool</TableHead>
+              <TableHead className="text-xs text-muted-foreground font-medium">Status</TableHead>
+              <TableHead className="text-xs text-muted-foreground font-medium">Started At</TableHead>
+              <TableHead className="text-xs text-muted-foreground font-medium">Duration</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {runs.map((run) => (
+            {runs.map((run, index) => (
               <TableRow 
                 key={run.id} 
-                className="hover:bg-muted/40 cursor-pointer"
+                className={cn(
+                  "hover:bg-muted/20 cursor-pointer transition-colors",
+                  index % 2 === 0 ? "bg-muted/5" : "bg-background"
+                )}
                 onClick={() => router.push(`/dashboard/runs/${run.id}`)}
               >
                 <TableCell className="font-mono text-xs text-muted-foreground">{run.id}</TableCell>
-                <TableCell className="text-foreground font-medium">{run.toolId}</TableCell>
+                <TableCell className="text-sm font-medium">{run.toolId}</TableCell>
                 <TableCell>
                   <Badge 
                     variant="outline" 
-                    className={`border-none ${
-                      run.status === "success"
-                        ? "bg-green-100 text-green-700"
-                        : run.status === "error"
-                        ? "bg-red-100 text-red-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
+                    className={cn(
+                      "border-none text-xs",
+                      run.status === "success" && "bg-green-50 text-green-600",
+                      run.status === "error" && "bg-red-50 text-red-600",
+                      run.status === "running" && "bg-yellow-50 text-yellow-600"
+                    )}
                   >
                     {run.status}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-muted-foreground">{formatDate(run.createdAt)}</TableCell>
-                <TableCell className="text-muted-foreground">
+                <TableCell className="text-xs text-muted-foreground">{formatDate(run.createdAt)}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">
                   {run.createdAt && run.updatedAt
                     ? `${((new Date(run.updatedAt).getTime() - new Date(run.createdAt).getTime()) / 1000).toFixed(1)}s`
                     : "-"}

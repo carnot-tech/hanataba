@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MCPServerManager } from "@/components/mcp-server-manager";
+import { cn } from "@/lib/utils";
 
 type JsonSchemaProperty = {
   type: string;
@@ -200,83 +201,112 @@ export default function MCPServerDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
+    <div>
+      {/* Header Section */}
+      <div className="flex items-center justify-between mb-3 pb-3 border-b">
         <div>
-          <h1 className="text-2xl font-bold">{server.name}</h1>
-          <p className="text-muted-foreground">{server.description}</p>
+          <h1 className="text-lg font-medium">{server.name}</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {server.description}
+          </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="ghost" onClick={() => setIsEditModalOpen(true)}>
-            <Pencil className="w-4 h-4 mr-2" />
-            Edit
+        <div className="flex gap-1">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setIsEditModalOpen(true)}
+            className="h-8 px-2"
+          >
+            <Pencil className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" className="text-destructive hover:text-destructive" onClick={handleDelete}>
-            <Trash2 className="w-4 h-4 mr-2" />
-            Delete
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 px-2 text-destructive hover:text-destructive hover:bg-destructive/5" 
+            onClick={handleDelete}
+          >
+            <Trash2 className="w-4 h-4" />
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border rounded-lg bg-background">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2">
-              <Badge variant={server.type === "sse" ? "default" : "secondary"} className="bg-muted/50 border-none">
+      {/* Main Content Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        {/* Server Configuration Card */}
+        <Card className="border rounded-sm bg-background">
+          <CardHeader className="pb-1.5">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium">Configuration</CardTitle>
+              <Badge 
+                variant="outline" 
+                className={cn(
+                  "border-none text-sm h-6",
+                  server.type === "sse" ? "bg-blue-50 text-blue-600" : "bg-purple-50 text-purple-600"
+                )}
+              >
                 {server.type === "sse" ? (
-                  <Globe className="w-4 h-4 mr-1" />
+                  <Globe className="h-3 w-3 mr-1" />
                 ) : (
-                  <Terminal className="w-4 h-4 mr-1" />
+                  <Terminal className="h-3 w-3 mr-1" />
                 )}
                 {server.type.toUpperCase()}
               </Badge>
-            </CardTitle>
+            </div>
           </CardHeader>
-          <CardContent className="p-4">
+          <CardContent className="p-1.5 pt-0">
             {server.type === "sse" ? (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-medium">URL</h3>
-                  <p className="text-sm text-muted-foreground">{server.url}</p>
+              <div className="space-y-1.5">
+                <div className="bg-muted/5 p-1.5 rounded-sm">
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground mb-0.5">
+                    <Globe className="h-3 w-3 flex-shrink-0" />
+                    <span>URL</span>
+                  </div>
+                  <p className="text-sm font-mono break-all">{server.url}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Headers</h3>
-                  <pre className="text-sm bg-muted/40 p-2 overflow-x-auto max-h-[200px] overflow-y-auto whitespace-pre-wrap break-all">
+                <div className="bg-muted/5 p-1.5 rounded-sm">
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground mb-0.5">
+                    <span>Headers</span>
+                  </div>
+                  <pre className="text-sm font-mono overflow-x-auto max-h-[200px] overflow-y-auto whitespace-pre-wrap break-all">
                     {typeof server.headers === 'string' ? server.headers : JSON.stringify(server.headers, null, 2)}
                   </pre>
                 </div>
               </div>
             ) : (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-medium">Command</h3>
-                  <p className="text-sm text-muted-foreground">{server.command}</p>
+              <div className="space-y-1.5">
+                <div className="bg-muted/5 p-1.5 rounded-sm">
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground mb-0.5">
+                    <Terminal className="h-3 w-3 flex-shrink-0" />
+                    <span>Command</span>
+                  </div>
+                  <p className="text-sm font-mono break-all">{server.command}</p>
                 </div>
-                <div>
-                  <h3 className="font-medium">Arguments</h3>
-                  <pre className="text-sm bg-muted/40 p-2 overflow-x-auto max-h-[200px] overflow-y-auto whitespace-pre-wrap break-all">
+                <div className="bg-muted/5 p-1.5 rounded-sm">
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground mb-0.5">
+                    <span>Arguments</span>
+                  </div>
+                  <pre className="text-sm font-mono overflow-x-auto max-h-[200px] overflow-y-auto whitespace-pre-wrap break-all">
                     {typeof server.args === 'string' ? server.args : JSON.stringify(server.args, null, 2)}
                   </pre>
                 </div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium">Environment Variables</h3>
+                <div className="bg-muted/5 p-1.5 rounded-sm">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <span>Environment Variables</span>
+                    </div>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setShowEnvVars(!showEnvVars)}
-                      className="text-muted-foreground hover:text-foreground"
+                      className="h-7 text-sm text-muted-foreground hover:text-foreground px-1"
                     >
-                      <ChevronDown className={`w-4 h-4 mr-1 transition-transform ${showEnvVars ? 'rotate-180' : ''}`} />
-                      {showEnvVars ? "Hide" : "Show"}
+                      <ChevronDown className={`w-3 h-3 transition-transform ${showEnvVars ? 'rotate-180' : ''}`} />
                     </Button>
                   </div>
                   {showEnvVars && (
-                    <div className="mt-2">
-                      <pre className="text-sm bg-muted/40 p-3 rounded-md overflow-x-auto max-h-[200px] overflow-y-auto whitespace-pre-wrap break-all border border-muted">
-                        {typeof server.env === 'string' ? server.env : JSON.stringify(server.env, null, 2)}
-                      </pre>
-                    </div>
+                    <pre className="text-sm font-mono overflow-x-auto max-h-[200px] overflow-y-auto whitespace-pre-wrap break-all">
+                      {typeof server.env === 'string' ? server.env : JSON.stringify(server.env, null, 2)}
+                    </pre>
                   )}
                 </div>
               </div>
@@ -284,25 +314,26 @@ export default function MCPServerDetailPage() {
           </CardContent>
         </Card>
 
-        <Card className="border rounded-lg bg-background">
-          <CardHeader className="pb-2">
-            <CardTitle>Server Information</CardTitle>
+        {/* Server Information Card */}
+        <Card className="border rounded-sm bg-background">
+          <CardHeader className="pb-1.5">
+            <CardTitle className="text-sm font-medium">Server Information</CardTitle>
           </CardHeader>
-          <CardContent className="p-4">
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-medium">Server ID</h3>
-                <p className="text-sm text-muted-foreground">{server.id}</p>
+          <CardContent className="p-1.5 pt-0">
+            <div className="space-y-1.5">
+              <div className="bg-muted/5 p-1.5 rounded-sm">
+                <div className="text-sm text-muted-foreground mb-0.5">Server ID</div>
+                <p className="text-sm font-mono">{server.id}</p>
               </div>
-              <div>
-                <h3 className="font-medium">Created At</h3>
-                <p className="text-sm text-muted-foreground">
+              <div className="bg-muted/5 p-1.5 rounded-sm">
+                <div className="text-sm text-muted-foreground mb-0.5">Created At</div>
+                <p className="text-sm">
                   {new Date(server.createdAt).toLocaleString()}
                 </p>
               </div>
-              <div>
-                <h3 className="font-medium">Last Updated</h3>
-                <p className="text-sm text-muted-foreground">
+              <div className="bg-muted/5 p-1.5 rounded-sm">
+                <div className="text-sm text-muted-foreground mb-0.5">Last Updated</div>
+                <p className="text-sm">
                   {new Date(server.updatedAt).toLocaleString()}
                 </p>
               </div>
@@ -311,71 +342,74 @@ export default function MCPServerDetailPage() {
         </Card>
       </div>
 
-      <Card className="border rounded-lg bg-background">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2">
-            <Wrench className="w-5 h-5" />
-            Available Tools
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4">
-          <div className="space-y-4">
-            {isLoadingTools ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin" />
-                <span className="ml-2">Loading tools...</span>
-              </div>
-            ) : tools.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No tools available</p>
-            ) : (
-              tools.map((tool) => (
-                <div key={tool.id} className="bg-muted/40 p-4 rounded-lg">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-medium">{tool.id}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{tool.description}</p>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      variant="ghost"
-                      className="ml-4"
-                      onClick={() => {
-                        setSelectedTool(tool);
-                        setParameters({});
-                        setIsExecuteModalOpen(true);
-                      }}
-                    >
-                      <Play className="w-4 h-4 mr-1" />
-                      Execute
-                    </Button>
-                  </div>
-                  {Object.keys(tool.parameters).length > 0 && (
-                    <div className="mt-2">
-                      <h4 className="text-sm font-medium text-muted-foreground">Parameters:</h4>
-                      <pre className="text-sm bg-muted/40 p-2 mt-1 overflow-x-auto max-h-[200px] overflow-y-auto whitespace-pre-wrap break-all">
-                        {JSON.stringify(tool.parameters, null, 2)}
-                      </pre>
-                    </div>
-                  )}
+      {/* Tools Section */}
+      <div className="mt-2">
+        <Card className="border rounded-sm bg-background">
+          <CardHeader className="pb-1.5">
+            <div className="flex items-center gap-1">
+              <Wrench className="w-4 h-4" />
+              <CardTitle className="text-sm font-medium">Available Tools</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="p-1.5 pt-0">
+            <div className="space-y-1.5">
+              {isLoadingTools ? (
+                <div className="flex items-center justify-center py-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="ml-1.5 text-sm text-muted-foreground">Loading tools...</span>
                 </div>
-              ))
-            )}
-          </div>
-        </CardContent>
-      </Card>
+              ) : tools.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No tools available</p>
+              ) : (
+                tools.map((tool) => (
+                  <div key={tool.id} className="bg-muted/5 p-1.5 rounded-sm">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="text-sm font-medium">{tool.id}</h3>
+                        <p className="text-sm text-muted-foreground mt-0.5">{tool.description}</p>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        className="h-7 px-1.5"
+                        onClick={() => {
+                          setSelectedTool(tool);
+                          setParameters({});
+                          setIsExecuteModalOpen(true);
+                        }}
+                      >
+                        <Play className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    {Object.keys(tool.parameters).length > 0 && (
+                      <div className="mt-1.5">
+                        <div className="text-sm text-muted-foreground mb-0.5">Parameters:</div>
+                        <pre className="text-sm font-mono bg-muted/10 p-1 rounded-sm overflow-x-auto max-h-[200px] overflow-y-auto whitespace-pre-wrap break-all">
+                          {JSON.stringify(tool.parameters, null, 2)}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
+      {/* Execute Tool Dialog */}
       <Dialog open={isExecuteModalOpen} onOpenChange={handleCloseModal}>
-        <DialogContent className="border rounded-lg bg-background">
+        <DialogContent className="border rounded-sm bg-background">
           <DialogHeader>
-            <DialogTitle>Execute Tool: {selectedTool?.id}</DialogTitle>
+            <DialogTitle className="text-sm font-medium">Execute Tool: {selectedTool?.id}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="space-y-2 py-2">
             <p className="text-sm text-muted-foreground">{selectedTool?.description}</p>
             
             {!executionResult && !executionError && (
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {selectedTool && (
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     {Object.entries((selectedTool.parameters as ToolParameter).jsonSchema.properties).map(
                       ([name, property]) => renderParameterInput(
                         name,
@@ -389,22 +423,22 @@ export default function MCPServerDetailPage() {
             )}
 
             {isExecuting && (
-              <div className="flex items-center justify-center py-4">
-                <Loader2 className="h-6 w-6 animate-spin" />
-                <span className="ml-2">Executing...</span>
+              <div className="flex items-center justify-center py-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="ml-1.5 text-sm text-muted-foreground">Executing...</span>
               </div>
             )}
 
             {executionError && (
-              <div className="bg-destructive/10 p-4 rounded-lg">
-                <p className="text-destructive">{executionError}</p>
+              <div className="bg-destructive/5 p-1.5 rounded-sm">
+                <p className="text-sm text-destructive">{executionError}</p>
               </div>
             )}
 
             {executionResult && (
-              <div className="space-y-2">
-                <h4 className="font-medium">Execution Result:</h4>
-                <pre className="bg-muted/40 p-4 rounded-lg overflow-x-auto max-h-[200px] overflow-y-auto whitespace-pre-wrap break-all">
+              <div className="space-y-1.5">
+                <div className="text-sm text-muted-foreground">Execution Result:</div>
+                <pre className="text-sm font-mono bg-muted/5 p-1.5 rounded-sm overflow-x-auto max-h-[200px] overflow-y-auto whitespace-pre-wrap break-all">
                   {JSON.stringify(executionResult, null, 2)}
                 </pre>
               </div>
@@ -412,20 +446,21 @@ export default function MCPServerDetailPage() {
           </div>
           <DialogFooter>
             {executionResult || executionError ? (
-              <Button variant="ghost" onClick={handleCloseModal}>
+              <Button variant="ghost" size="sm" onClick={handleCloseModal}>
                 Close
               </Button>
             ) : (
               <>
-                <Button variant="ghost" onClick={handleCloseModal}>
+                <Button variant="ghost" size="sm" onClick={handleCloseModal}>
                   Cancel
                 </Button>
                 <Button 
                   variant="ghost"
+                  size="sm"
                   onClick={handleExecute} 
                   disabled={isExecuting}
                 >
-                  {isExecuting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isExecuting && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
                   Execute
                 </Button>
               </>
