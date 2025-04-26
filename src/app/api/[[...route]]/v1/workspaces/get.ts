@@ -3,6 +3,7 @@ import { db } from "@/db/drizzle";
 import { workspacesTable, workspaceSelectSchema } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { AuthVariables } from "@/app/api/[[...route]]/middleware/auth";
+import { WorkspacePolicy } from "@/domain/policy/workspace";
 
 const outputSchema = workspaceSelectSchema;
 
@@ -40,6 +41,10 @@ const handler: RouteHandler<typeof route, { Variables: AuthVariables }> = async 
 
   const user = c.get("user");
   if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  if (!await WorkspacePolicy().canGet(user.id, id)) {
     return c.json({ error: "Unauthorized" }, 401);
   }
 

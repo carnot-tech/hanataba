@@ -3,7 +3,7 @@ import { db } from "@/db/drizzle";
 import { workspacesTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { AuthVariables } from "@/app/api/[[...route]]/middleware/auth";
-
+import { WorkspacePolicy } from "@/domain/policy/workspace";
 const route = createRoute({
 	method: "delete",
 	path: "/:id",
@@ -32,6 +32,10 @@ const handler: RouteHandler<typeof route, { Variables: AuthVariables }> = async 
   if (!user) {
     return c.json({ error: "Unauthorized" }, 401);
   }
+
+	if (!await WorkspacePolicy().canDelete(user.id, id)) {
+		return c.json({ error: "Unauthorized" }, 401);
+	}
 
 	const workspace = await db
 		.delete(workspacesTable)

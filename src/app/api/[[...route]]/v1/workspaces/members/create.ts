@@ -3,7 +3,7 @@ import { db } from "@/db/drizzle";
 import { membershipsTable, membershipSelectSchema, membershipInsertSchema, workspacesTable } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import type { AuthVariables } from "@/app/api/[[...route]]/middleware/auth";
-
+import { WorkspacePolicy } from "@/domain/policy/workspace";
 const inputSchema = membershipInsertSchema.omit({
   id: true,
   createdAt: true,
@@ -64,6 +64,10 @@ const handler: RouteHandler<typeof route, { Variables: AuthVariables }> = async 
   });
   if (!workspace) {
     return c.json({ error: "Workspace not found" }, 404);
+  }
+
+  if (!await WorkspacePolicy().canUpdate(user.id, workspaceId)) {
+    return c.json({ error: "Unauthorized" }, 401);
   }
 
   const existingMembership = await db.query.membershipsTable.findFirst({

@@ -3,7 +3,7 @@ import { db } from "@/db/drizzle";
 import { mcpServerSelectSchema, mcpServersTable, mcpServerUpdateSchema } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { AuthVariables } from "@/app/api/[[...route]]/middleware/auth";
-
+import { McpPolicy } from "@/domain/policy/mcp";
 const inputSchema = mcpServerUpdateSchema.omit({
   id: true,
   createdAt: true,
@@ -49,10 +49,14 @@ const handler: RouteHandler<typeof route, {
   const raw = await c.req.json();
   const valid = inputSchema.parse(raw);
 
-  // const user = c.get("user");
-  // if (!user) {
-  //   return c.json({ error: "Unauthorized" }, 401);
-  // }
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  if (!await McpPolicy().canUpdate(user.id, id)) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
 
   const mcpServer = await db.query.mcpServersTable.findFirst({
     where: eq(mcpServersTable.id, id),

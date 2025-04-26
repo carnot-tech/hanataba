@@ -3,7 +3,7 @@ import { db } from "@/db/drizzle";
 import { mcpServersTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { AuthVariables } from "@/app/api/[[...route]]/middleware/auth";
-
+import { McpPolicy } from "@/domain/policy/mcp";
 const route = createRoute({
   method: "delete",
   path: "/:id",
@@ -32,6 +32,10 @@ const handler: RouteHandler<typeof route, {
 
   const user = c.get("user");
   if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  if (!await McpPolicy().canDelete(user.id, id)) {
     return c.json({ error: "Unauthorized" }, 401);
   }
 

@@ -3,6 +3,7 @@ import { db } from "@/db/drizzle";
 import { mcpRunSelectSchema, mcpRunsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { AuthVariables } from "@/app/api/[[...route]]/middleware/auth";
+import { RunPolicy } from "@/domain/policy/run";
 
 const outputSchema = mcpRunSelectSchema;
 
@@ -40,10 +41,13 @@ const handler: RouteHandler<typeof route, {
     return c.json({ error: "MCP run ID is required" }, 400);
   }
 
-  // const user = c.get("user");
-  // if (!user) {
-  //   return c.json({ error: "Unauthorized" }, 401);
-  // }
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+  if (!await RunPolicy().canGet(user.id, id)) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
 
   const project = await db.query.mcpRunsTable.findFirst({
     where: eq(mcpRunsTable.id, id),

@@ -3,7 +3,7 @@ import { db } from "@/db/drizzle";
 import { membershipsTable } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import type { AuthVariables } from "@/app/api/[[...route]]/middleware/auth";
-
+import { WorkspacePolicy } from "@/domain/policy/workspace";
 const route = createRoute({
 	method: "delete",
 	path: "/:id",
@@ -43,6 +43,10 @@ const handler: RouteHandler<
 	});
 	if (!membership) {
 		return c.json({ error: "Member not found in workspace" }, 404);
+	}
+
+	if (!await WorkspacePolicy().canUpdate(user.id, membership.workspaceId)) {
+		return c.json({ error: "Unauthorized" }, 401);
 	}
 
 	await db.delete(membershipsTable).where(eq(membershipsTable.id, membershipId));

@@ -4,6 +4,7 @@ import type { AuthVariables } from "@/app/api/[[...route]]/middleware/auth";
 import { mcpServersTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getTools } from "@/domain/usecase/mcp";
+import { WorkspacePolicy } from "@/domain/policy/workspace";
 
 const toolSchema = z.object({
   id: z.string(),
@@ -44,12 +45,22 @@ const handler: RouteHandler<typeof route, {
     return c.json({ error: "MCP ID is required" }, 400);
   }
 
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
   const mcp = await db.query.mcpServersTable.findFirst({
     where: eq(mcpServersTable.id, mcpId),
   });
   if (!mcp) {
     return c.json({ error: "MCP not found" }, 404);
   }
+
+  if (!await WorkspacePolicy().canGet(user.id, mcp.workspaceId)) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
   const tools = await getTools(
     mcp.type === "sse"
       ? {
