@@ -11,7 +11,7 @@ export const useWorkspace = () => {
   useEffect(() => {
     const initializeWorkspace = async () => {
       try {
-        // クライアントサイドでのみlocalStorageにアクセス
+        // Access localStorage only on client side
         const storedWorkspace = typeof window !== 'undefined' 
           ? localStorage.getItem(ACTIVE_WORKSPACE_KEY)
           : null;

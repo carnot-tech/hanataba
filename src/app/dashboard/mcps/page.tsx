@@ -125,7 +125,9 @@ export default function Page() {
       <MCPServerManager
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleSubmit}
+        onSubmit={(data) => {
+          handleSubmit(data as MCPServerInsertType);
+        }}
       />
     </div>
   );

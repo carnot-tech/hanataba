@@ -12,7 +12,7 @@ import {
 	DialogFooter,
 } from "@/components/ui/dialog";
 import { Plus, X } from "lucide-react";
-import type { MCPServerInsertType, MCPServersType } from "@/lib/api-client/types";
+import type { MCPServerInsertType, MCPServersType, MCPServerUpdateType } from "@/lib/api-client/types";
 import { useWorkspace } from "@/hooks/use-workspace";
 import {
 	Accordion,
@@ -24,7 +24,7 @@ import {
 interface MCPServerManagerProps {
 	isOpen: boolean;
 	onClose: () => void;
-	onSubmit: (server: MCPServerInsertType) => void;
+	onSubmit: (server: MCPServerInsertType | MCPServerUpdateType) => void;
 	mode?: "create" | "edit";
 	initialData?: MCPServersType;
 }
@@ -80,7 +80,7 @@ export function MCPServerManager({
 	initialData,
 }: MCPServerManagerProps) {
 	const { activeWorkspace } = useWorkspace();
-	const [serverType, setServerType] = useState<ServerType>(initialData?.type ?? "sse");
+	const [serverType, setServerType] = useState<ServerType>(initialData?.type ?? "stdio");
 	const [sseServer, setSseServer] = useState<SSEServerForm>(() => {
 		if (mode === "edit" && initialData?.type === "sse") {
 			return {
@@ -161,12 +161,12 @@ export function MCPServerManager({
 		<div className="space-y-2">
 			<Label>Type</Label>
 			<div className="flex gap-4">
-				<Button
+				{/* <Button
 					variant={serverType === "sse" ? "default" : "outline"}
 					onClick={() => setServerType("sse")}
 				>
 					SSE
-				</Button>
+				</Button> */}
 				<Button
 					variant={serverType === "stdio" ? "default" : "outline"}
 					onClick={() => setServerType("stdio")}

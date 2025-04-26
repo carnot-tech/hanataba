@@ -10,6 +10,10 @@ export type MCPServerInsertType = InferRequestType<
 	ClientType["api"]["v1"]["mcps"]["$post"]
 >["json"];
 
+export type MCPServerUpdateType = InferRequestType<
+	ClientType["api"]["v1"]["mcps"][":id"]["$put"]
+>["json"];
+
 export type MCPServersType = InferResponseType<
 	ClientType["api"]["v1"]["mcps"]["$get"],
 	200
@@ -26,6 +30,11 @@ export type MCPToolType = InferResponseType<
 >[number];
 
 export type MCPRunType = InferResponseType<
+	ClientType["api"]["v1"]["runs"]["$post"],
+	200
+>;
+
+export type MCPRunResultType = InferResponseType<
 	ClientType["api"]["v1"]["runs"]["$post"],
 	200
 >;

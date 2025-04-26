@@ -47,7 +47,7 @@ export default function RunDetailPage() {
     return <div className="p-8 text-center text-red-500">Run not found</div>;
   }
 
-  // メタデータの整形
+  // Format metadata
   const meta = [
     {
       label: "RUN STATUS",
@@ -79,12 +79,9 @@ export default function RunDetailPage() {
     },
   ];
 
-  // parameters/resultまとめて1つのJSONとして表示
   const combinedJson = {
     parameters: run.parameters,
     result: run.result,
-    channel: run.channel,
-    // 必要なら他のフィールドもここに追加
   };
 
   return (
@@ -93,7 +90,7 @@ export default function RunDetailPage() {
         <h1 className="text-2xl font-bold">Run Detail</h1>
         <Button variant="outline" onClick={() => router.push("/dashboard/runs")}>Back to Runs</Button>
       </div>
-      {/* メタデータ部分: 横並び */}
+      {/* Metadata section: horizontal layout */}
       <div className="flex flex-wrap gap-4 mb-4">
         {meta.map((item) => (
           <div key={item.label} className="flex flex-col min-w-[120px] bg-muted/40 p-3 rounded-lg">
@@ -102,7 +99,7 @@ export default function RunDetailPage() {
           </div>
         ))}
       </div>
-      {/* 内容部分: タイトル＋大きなJSONボックス */}
+      {/* Content section: title + large JSON box */}
       <div className="mb-2 font-semibold text-muted-foreground">At run on {formatDate(run.createdAt)}</div>
       <div className="bg-muted/40 border rounded-lg p-4 font-mono text-xs whitespace-pre-wrap break-all">
         {JSON.stringify(combinedJson, null, 2)}

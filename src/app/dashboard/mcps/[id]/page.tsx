@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Globe, Terminal, Trash2, Wrench, Play, Loader2, Pencil, ChevronDown } from "lucide-react";
-import type { MCPServersType, MCPToolType } from "@/lib/api-client/types";
+import type { MCPServersType, MCPServerUpdateType, MCPToolType } from "@/lib/api-client/types";
 import { client } from "@/lib/api-client";
 import {
   Dialog,
@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MCPServerManager } from "@/components/mcp-server-manager";
 import { cn } from "@/lib/utils";
+import type { MCPRunResultType } from "@/lib/api-client/types";
 
 type JsonSchemaProperty = {
   type: string;
@@ -36,11 +37,6 @@ type ToolParameter = {
   jsonSchema: JsonSchema;
 };
 
-type ExecutionResult = {
-  output: string;
-  error?: string;
-};
-
 export default function MCPServerDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -52,7 +48,7 @@ export default function MCPServerDetailPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [parameters, setParameters] = useState<Record<string, string>>({});
   const [isExecuting, setIsExecuting] = useState(false);
-  const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null);
+  const [executionResult, setExecutionResult] = useState<MCPRunResultType | null>(null);
   const [executionError, setExecutionError] = useState<string | null>(null);
   const [showEnvVars, setShowEnvVars] = useState(false);
 
@@ -149,7 +145,7 @@ export default function MCPServerDetailPage() {
   const handleExecute = async () => {
     if (!selectedTool) return;
     
-    // バリデーション
+    // Validation
     const schema = (selectedTool.parameters as ToolParameter).jsonSchema;
     const requiredFields = schema.required || [];
     const missingFields = requiredFields.filter(field => !parameters[field]);
@@ -181,7 +177,7 @@ export default function MCPServerDetailPage() {
     setExecutionError(null);
   };
 
-  const handleEdit = async (updatedServer: MCPServersType) => {
+  const handleEdit = async (updatedServer: MCPServerUpdateType) => {
     const response = await client.api.v1.mcps[":id"].$put({
       param: {
         id: params.id as string,
