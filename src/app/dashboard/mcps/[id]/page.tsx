@@ -93,8 +93,8 @@ export default function MCPServerDetailPage() {
   };
 
   const handleToolExecute = async (toolId: string, parameters: Record<string, string>) => {
-    const response = await client.api.v1.mcps[":mcpId"].runs.$post({
-      param: {
+    const response = await client.api.v1.runs.$post({
+      query: {
         mcpId: params.id as string,
       },
       json: {

@@ -16,7 +16,7 @@ const route = createRoute({
   method: "post",
   path: "/",
   request: {
-    params: z.object({
+    query: z.object({
       mcpId: z.string(),
     }),
     body: {
@@ -48,7 +48,7 @@ const handler: RouteHandler<
     Variables: AuthVariables
   }
 > = async (c) => {
-  const mcpId = c.req.param("mcpId");
+  const mcpId = c.req.query("mcpId");
   if (!mcpId) {
     return c.json({ error: "MCP ID is required" }, 400);
   }

@@ -20,7 +20,12 @@ export type WorkspaceType = InferResponseType<
 	200
 >[number];
 
-export type ToolType = InferResponseType<
+export type MCPToolType = InferResponseType<
 	ClientType["api"]["v1"]["mcps"][":mcpId"]["tools"]["$get"],
 	200
 >[number];
+
+export type MCPRunType = InferResponseType<
+	ClientType["api"]["v1"]["mcps"][":mcpId"]["runs"]["$post"],
+	200
+>;

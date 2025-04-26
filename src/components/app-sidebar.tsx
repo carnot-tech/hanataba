@@ -66,7 +66,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         return
       }
       const data = await response.json()
-      console.log(data)
       setWorkspaces(data)
     }
     fetchWorkspaces()

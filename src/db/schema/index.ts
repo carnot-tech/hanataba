@@ -109,6 +109,12 @@ export const mcpRunsTable = pgTable("mcp_runs", {
 	createdAt: timestamp("created_at").notNull(),
 	updatedAt: timestamp("updated_at").notNull(),
 });
+export const mcpRunsRelations = relations(mcpRunsTable, ({ one }) => ({
+	mcp: one(mcpServersTable, {
+		fields: [mcpRunsTable.mcpId],
+		references: [mcpServersTable.id],
+	}),
+}));
 export const mcpRunSelectSchema = createSelectSchema(mcpRunsTable);
 export const mcpRunInsertSchema = createInsertSchema(mcpRunsTable);
 export const mcpRunUpdateSchema = createUpdateSchema(mcpRunsTable);
