@@ -5,10 +5,12 @@ import {
   Home,
   ListCheck as Runs,
   Blocks as MCPs,
+  SettingsIcon,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
+import { NavSecondary } from "@/components/nav-secondary"
 import { WorkspaceSwitcher } from "@/components/workspace-switcher"
 import {
   Sidebar,
@@ -37,6 +39,13 @@ const data = {
       title: "Runs",
       url: "/dashboard/runs",
       icon: Runs,
+    }
+  ],
+  navSecondary: [
+    {
+      title: "Settings",
+      url: "/dashboard/settings",
+      icon: SettingsIcon,
     }
   ],
 }
@@ -78,6 +87,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
+        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user ? {
