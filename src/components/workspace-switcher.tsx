@@ -19,17 +19,12 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Skeleton } from "@/components/ui/skeleton"
-
-interface Workspace {
-  id: string;
-  name: string;
-  accessToken: string;
-}
+import type { WorkspaceType } from "@/lib/api-client"
 
 export function WorkspaceSwitcher({
   workspaces,
 }: {
-  workspaces: Workspace[]
+  workspaces: WorkspaceType[]
 }) {
   const { isMobile } = useSidebar()
   const { activeWorkspace, setWorkspace } = useWorkspace()

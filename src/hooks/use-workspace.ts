@@ -1,16 +1,11 @@
 import { useState, useEffect } from 'react';
 import { client } from '@/lib/api-client';
+import type { WorkspaceType } from '@/lib/api-client';
 
 const ACTIVE_WORKSPACE_KEY = 'active_workspace';
 
-interface Workspace {
-  id: string;
-  name: string;
-  accessToken: string;
-}
-
 export const useWorkspace = () => {
-  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(null);
+  const [activeWorkspace, setActiveWorkspace] = useState<WorkspaceType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -28,7 +23,7 @@ export const useWorkspace = () => {
           if (response.status !== 200) {
             return;
           }
-          const workspaces = (await response.json() as unknown) as Workspace[];
+          const workspaces = (await response.json() as unknown) as WorkspaceType[];
           if (workspaces.length > 0) {
             setWorkspace(workspaces[0]);
           }
@@ -43,7 +38,7 @@ export const useWorkspace = () => {
     initializeWorkspace();
   }, []);
 
-  const setWorkspace = (workspace: Workspace) => {
+  const setWorkspace = (workspace: WorkspaceType) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem(ACTIVE_WORKSPACE_KEY, JSON.stringify(workspace));
     }

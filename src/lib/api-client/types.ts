@@ -26,6 +26,6 @@ export type MCPToolType = InferResponseType<
 >[number];
 
 export type MCPRunType = InferResponseType<
-	ClientType["api"]["v1"]["mcps"][":mcpId"]["runs"]["$post"],
+	ClientType["api"]["v1"]["runs"]["$post"],
 	200
 >;
