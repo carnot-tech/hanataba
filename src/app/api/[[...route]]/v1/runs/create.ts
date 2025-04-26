@@ -56,16 +56,27 @@ const handler: RouteHandler<
   const raw = await c.req.json();
 	const valid = inputSchema.parse(raw);
 
-  const user = c.get("user");
-  if (!user) {
-    return c.json({ error: "Unauthorized" }, 401);
-  }
-
   const mcp = await db.query.mcpServersTable.findFirst({
     where: eq(mcpServersTable.id, mcpId),
+    with: {
+      workspace: true,
+    },
   });
   if (!mcp) {
     return c.json({ error: "MCP not found" }, 404);
+  }
+
+  const user = c.get("user");
+  if (!user) {
+    const authHeader = c.req.header("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return c.json({ error: "Invalid authorization header" }, 401);
+    }
+
+    const accessToken = authHeader.slice(7);
+    if (accessToken !== mcp.workspace.accessToken) {
+      return c.json({ error: "Invalid access token" }, 401);
+    }
   }
 
   const tools = await getTools(

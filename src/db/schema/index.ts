@@ -9,6 +9,7 @@ import {
 import { usersTable } from "./better-auth";
 import { createSchemaFactory } from "drizzle-zod";
 import { relations } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 const { createSelectSchema, createInsertSchema, createUpdateSchema } =
 	createSchemaFactory({
@@ -20,6 +21,7 @@ const { createSelectSchema, createInsertSchema, createUpdateSchema } =
 export const workspacesTable = pgTable("workspaces", {
 	id: text("id").primaryKey(),
 	name: varchar("name", { length: 256 }).notNull(),
+	accessToken: text("access_token").unique().notNull().default(sql`gen_random_uuid()`),
 	createdAt: timestamp("created_at").notNull().defaultNow(),
 	updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -118,5 +120,6 @@ export const mcpRunsRelations = relations(mcpRunsTable, ({ one }) => ({
 export const mcpRunSelectSchema = createSelectSchema(mcpRunsTable);
 export const mcpRunInsertSchema = createInsertSchema(mcpRunsTable);
 export const mcpRunUpdateSchema = createUpdateSchema(mcpRunsTable);
+
 
 export * from "./better-auth";

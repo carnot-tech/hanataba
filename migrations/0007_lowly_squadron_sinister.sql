@@ -1,0 +1,2 @@
+ALTER TABLE "workspaces" ADD COLUMN "access_token" text DEFAULT gen_random_uuid() NOT NULL;--> statement-breakpoint
+ALTER TABLE "workspaces" ADD CONSTRAINT "workspaces_access_token_unique" UNIQUE("access_token");
