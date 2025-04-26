@@ -24,20 +24,20 @@ export default function Page() {
 	return (
 		<div className="flex flex-col gap-10">
 			<div className="flex justify-between items-center">
-				<h1 className="text-[28px] font-semibold">Workspaceを選択</h1>
+				<h1 className="text-[28px] font-semibold">Select Workspace</h1>
 				<Button variant="outline" asChild>
-					<Link href="/workspaces/new">Workspaceを作成</Link>
+					<Link href="/workspaces/new">Create Workspace</Link>
 				</Button>
 			</div>
 
 			{workspaces.length === 0 ? (
 				<div className="text-center py-12">
 					<p className="text-lg text-muted-foreground mb-4">
-						Workspaceがまだ作成されていません
+						No workspaces have been created yet
 					</p>
 					<Button variant="outline" asChild>
 						<Link href="/workspaces/new">
-							最初のWorkspaceを作成する
+							Create your first workspace
 						</Link>
 					</Button>
 				</div>

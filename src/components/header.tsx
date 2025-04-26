@@ -49,17 +49,17 @@ export function Header() {
 							<DropdownMenuGroup>
 								<DropdownMenuItem>
 									<User className="mr-2 h-4 w-4" />
-									<span>プロフィール</span>
+									<span>Profile</span>
 								</DropdownMenuItem>
 								<DropdownMenuItem>
 									<Settings className="mr-2 h-4 w-4" />
-									<span>設定</span>
+									<span>Settings</span>
 								</DropdownMenuItem>
 							</DropdownMenuGroup>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem>
 								<LogOut className="mr-2 h-4 w-4" />
-								<span>ログアウト</span>
+								<span>Logout</span>
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

@@ -31,18 +31,18 @@ export default function Page() {
   return (
     <>
       <div className="flex justify-center mb-12">
-        <h1 className="text-[28px] font-semibold leading-none">Workspaceを作成</h1>
+        <h1 className="text-[28px] font-semibold leading-none">Create Workspace</h1>
       </div>
 
       <div className="mx-auto max-w-[480px]">
         <form className="space-y-8" onSubmit={handleSubmit}>
           <div className="space-y-2.5">
             <label htmlFor="workspace-name" className="text-sm font-medium leading-none">
-              Workspace名
+              Workspace Name
             </label>
             <Input 
               id="workspace-name" 
-              placeholder="Workspace名を入力" 
+              placeholder="Enter workspace name" 
               className="h-11"
               value={newWorkspace.name}
               onChange={(e) => setNewWorkspace({ ...newWorkspace, name: e.target.value })}
@@ -55,7 +55,7 @@ export default function Page() {
             className="w-full h-11"
             disabled={!isValid}
           >
-            Workspaceを作成
+            Create Workspace
           </Button>
         </form>
       </div>

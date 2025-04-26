@@ -76,7 +76,10 @@ export function WorkspaceSwitcher({
             {workspaces.map((workspace, index) => (
               <DropdownMenuItem
                 key={workspace.name}
-                onClick={() => setWorkspace(workspace)}
+                onClick={() => {
+                  setWorkspace(workspace)
+                  window.location.reload()
+                }}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-md border">
@@ -87,7 +90,12 @@ export function WorkspaceSwitcher({
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
+            <DropdownMenuItem 
+              onClick={() => {
+                window.location.href = '/workspaces/new'
+              }}
+              className="gap-2 p-2"
+            >
               <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                 <Plus className="size-4" />
               </div>

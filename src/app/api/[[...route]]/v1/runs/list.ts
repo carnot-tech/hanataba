@@ -2,7 +2,7 @@ import { createRoute, type RouteHandler } from "@hono/zod-openapi";
 import { db } from "@/db/drizzle";
 import type { AuthVariables } from "@/app/api/[[...route]]/middleware/auth";
 import { mcpRunSelectSchema, mcpRunsTable, mcpServersTable } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, getTableColumns } from "drizzle-orm";
 import { z } from "zod";
 import { WorkspacePolicy } from "@/domain/policy/workspace";
 
@@ -14,7 +14,6 @@ const route = createRoute({
 	request: {
 		query: z.object({
 			workspaceId: z.string(),
-			mcpId: z.string().optional(),
 			limit: z.number().optional().default(10),
 			offset: z.number().optional().default(0),
 		}),
@@ -40,7 +39,7 @@ const handler: RouteHandler<
 		Variables: AuthVariables;
 	}
 > = async (c) => {
-	const { workspaceId, mcpId, limit, offset } = c.req.query();
+	const { workspaceId, limit, offset } = c.req.query();
 	if (!workspaceId) {
 		return c.json({ error: "Workspace ID is required" }, 400);
 	}
@@ -54,17 +53,16 @@ const handler: RouteHandler<
 		return c.json({ error: "Unauthorized" }, 401);
 	}
 
-	const mcps = await db.query.mcpRunsTable.findMany({
-		// where: eq(mcpRunsTable.mcpId, mcpId),
-		limit: Number(limit),
-		offset: Number(offset),
-		with: {
-			mcp: {
-				where: eq(mcpServersTable.workspaceId, workspaceId),
-			},
-		},
-		orderBy: desc(mcpRunsTable.createdAt),
-	});
+	const mcps = await db
+		.select({
+			...getTableColumns(mcpRunsTable),
+		})
+		.from(mcpRunsTable)
+		.leftJoin(mcpServersTable, eq(mcpRunsTable.mcpId, mcpServersTable.id))
+		.where(eq(mcpServersTable.workspaceId, workspaceId))
+		.orderBy(desc(mcpRunsTable.createdAt))
+		.limit(Number(limit))
+		.offset(Number(offset));
 	return c.json(mcps, 200);
 };
 
