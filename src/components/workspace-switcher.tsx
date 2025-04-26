@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { ChevronsUpDown, Plus, Cat } from "lucide-react"
-
+import { useWorkspace } from "@/hooks/use-workspace"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,13 +19,17 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Skeleton } from "@/components/ui/skeleton"
-import type { WorkspaceType } from "@/lib/api-client"
-import { useWorkspace } from "@/hooks/use-workspace"
+
+interface Workspace {
+  id: string;
+  name: string;
+  accessToken: string;
+}
 
 export function WorkspaceSwitcher({
   workspaces,
 }: {
-  workspaces: WorkspaceType[]
+  workspaces: Workspace[]
 }) {
   const { isMobile } = useSidebar()
   const { activeWorkspace, setWorkspace } = useWorkspace()
