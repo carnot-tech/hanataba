@@ -1,0 +1,31 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Dashboard UI Styling Rules
+
+## テーブル・カード・ダイアログの配色・可視性
+
+- ダッシュボード配下のページ（`src/app/dashboard/`）では、テーブルやカード、ダイアログの配色・可視性を統一すること。
+- テーブルやカードの背景色は `bg-background` を基本とし、`border` と `rounded-lg` を付与して視認性を高める。
+- サブ要素や情報ボックスには `bg-muted/40` や `rounded-lg` を適宜利用し、コントラストと区切りを明確にする。
+- テーブルヘッダーや重要なテキストには `font-medium` などで強調する。
+- ダイアログも同様に `bg-background`、`border`、`rounded-lg` を適用する。
+- ステータスバッジやメタ情報の配色も、背景色と文字色のコントラストを意識して設定する。
+
+## 参考ファイル
+- [src/app/dashboard/runs/page.tsx](mdc:src/app/dashboard/runs/page.tsx)
+- [src/app/dashboard/runs/[id]/page.tsx](mdc:src/app/dashboard/runs/[id]/page.tsx)
+- [src/app/dashboard/mcps/page.tsx](mdc:src/app/dashboard/mcps/page.tsx)
+- [src/app/dashboard/mcps/[id]/page.tsx](mdc:src/app/dashboard/mcps/[id]/page.tsx)
+
+## 適用例
+- 一覧テーブルやカードの背景色: `bg-background`、枠線: `border`、角丸: `rounded-lg`
+- メタ情報やサブ情報: `bg-muted/40`、`rounded-lg`、`p-3` などで装飾
+- ステータスバッジ: ステータスごとに明確な配色（例: success=緑, error=赤, その他=黄）
+- ダイアログ: `bg-background`、`border`、`rounded-lg` を必ず付与
+
+## 備考
+- Tailwind CSSとshadcn/uiのコンポーネント設計・クラス命名規則に従うこと
+- 既存のスタイルと一貫性を持たせること

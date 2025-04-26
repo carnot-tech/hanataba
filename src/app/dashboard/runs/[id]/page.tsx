@@ -96,7 +96,7 @@ export default function RunDetailPage() {
       {/* メタデータ部分: 横並び */}
       <div className="flex flex-wrap gap-4 mb-4">
         {meta.map((item) => (
-          <div key={item.label} className="flex flex-col min-w-[120px]">
+          <div key={item.label} className="flex flex-col min-w-[120px] bg-muted/40 p-3 rounded-lg">
             <span className="text-xs text-muted-foreground font-medium mb-1 tracking-wide uppercase">{item.label}</span>
             <span className="text-base font-semibold break-all">{item.value}</span>
           </div>

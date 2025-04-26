@@ -52,9 +52,9 @@ export default function Page() {
   
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">MCPs</h1>
-        <Button onClick={() => setIsModalOpen(true)} className="gap-2">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-foreground">MCPs</h1>
+        <Button onClick={() => setIsModalOpen(true)} className="gap-2" variant="ghost">
           <PlusCircle className="h-4 w-4" />
           Add MCP
         </Button>
@@ -63,13 +63,13 @@ export default function Page() {
         {mcps.map((mcp) => (
           <Card 
             key={mcp.id} 
-            className="hover:shadow-lg transition-shadow cursor-pointer"
+            className="border rounded-lg bg-background hover:bg-muted/40 transition-colors cursor-pointer"
             onClick={() => router.push(`/dashboard/mcps/${mcp.id}`)}
           >
-            <CardHeader>
+            <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold">{mcp.name}</CardTitle>
-                <Badge variant={mcp.type === "sse" ? "default" : "secondary"}>
+                <CardTitle className="text-base font-medium text-foreground">{mcp.name}</CardTitle>
+                <Badge variant={mcp.type === "sse" ? "default" : "secondary"} className="bg-muted/50 border-none text-foreground">
                   {mcp.type === "sse" ? (
                     <Globe className="h-3 w-3 mr-1" />
                   ) : (
@@ -79,7 +79,7 @@ export default function Page() {
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4">
               {mcp.type === "sse" && mcp.url && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Globe className="h-4 w-4" />
