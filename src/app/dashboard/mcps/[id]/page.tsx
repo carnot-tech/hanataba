@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MCPServerManager } from "@/components/mcp-server-manager";
 
 type JsonSchemaProperty = {
   type: string;
@@ -48,7 +49,6 @@ export default function MCPServerDetailPage() {
   const [selectedTool, setSelectedTool] = useState<MCPToolType | null>(null);
   const [isExecuteModalOpen, setIsExecuteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editForm, setEditForm] = useState<Partial<MCPServersType>>({});
   const [parameters, setParameters] = useState<Record<string, string>>({});
   const [isExecuting, setIsExecuting] = useState(false);
   const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null);
@@ -180,24 +180,18 @@ export default function MCPServerDetailPage() {
     setExecutionError(null);
   };
 
-  const handleEdit = async () => {
-    if (!server) return;
-    
+  const handleEdit = async (updatedServer: MCPServersType) => {
     const response = await client.api.v1.mcps[":id"].$put({
       param: {
         id: params.id as string,
       },
-      json: {
-        ...server,
-        ...editForm,
-      },
+      json: updatedServer,
     });
     
     if (response.ok) {
-      const updatedServer = await response.json();
-      setServer(updatedServer);
+      const data = await response.json();
+      setServer(data);
       setIsEditModalOpen(false);
-      setEditForm({});
     }
   };
 
@@ -213,10 +207,7 @@ export default function MCPServerDetailPage() {
           <p className="text-muted-foreground">{server.description}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="ghost" onClick={() => {
-            setEditForm(server);
-            setIsEditModalOpen(true);
-          }}>
+          <Button variant="ghost" onClick={() => setIsEditModalOpen(true)}>
             <Pencil className="w-4 h-4 mr-2" />
             Edit
           </Button>
@@ -443,93 +434,13 @@ export default function MCPServerDetailPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="border rounded-lg bg-background">
-          <DialogHeader>
-            <DialogTitle>Edit Server</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                value={editForm.name || ''}
-                onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Enter server name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Input
-                id="description"
-                value={editForm.description || ''}
-                onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Enter server description"
-              />
-            </div>
-            {server?.type === "sse" ? (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="url">URL</Label>
-                  <Input
-                    id="url"
-                    value={editForm.url || ''}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, url: e.target.value }))}
-                    placeholder="Enter server URL"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="headers">Headers</Label>
-                  <Input
-                    id="headers"
-                    value={typeof editForm.headers === 'string' ? editForm.headers : JSON.stringify(editForm.headers || {})}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, headers: e.target.value }))}
-                    placeholder="Enter headers as JSON"
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="command">Command</Label>
-                  <Input
-                    id="command"
-                    value={editForm.command || ''}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, command: e.target.value }))}
-                    placeholder="Enter command"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="args">Arguments</Label>
-                  <Input
-                    id="args"
-                    value={typeof editForm.args === 'string' ? editForm.args : JSON.stringify(editForm.args || [])}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, args: e.target.value }))}
-                    placeholder="Enter arguments as JSON array"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="env">Environment Variables</Label>
-                  <Input
-                    id="env"
-                    value={typeof editForm.env === 'string' ? editForm.env : JSON.stringify(editForm.env || {})}
-                    onChange={(e) => setEditForm(prev => ({ ...prev, env: e.target.value }))}
-                    placeholder="Enter environment variables as JSON"
-                  />
-                </div>
-              </>
-            )}
-          </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setIsEditModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="ghost" onClick={handleEdit}>
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <MCPServerManager
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSubmit={handleEdit}
+        mode="edit"
+        initialData={server}
+      />
     </div>
   );
 }

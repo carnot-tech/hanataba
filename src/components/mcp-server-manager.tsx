@@ -12,7 +12,7 @@ import {
 	DialogFooter,
 } from "@/components/ui/dialog";
 import { Plus, X } from "lucide-react";
-import type { MCPServerInsertType } from "@/lib/api-client/types";
+import type { MCPServerInsertType, MCPServersType } from "@/lib/api-client/types";
 import { useWorkspace } from "@/hooks/use-workspace";
 import {
 	Accordion,
@@ -25,6 +25,8 @@ interface MCPServerManagerProps {
 	isOpen: boolean;
 	onClose: () => void;
 	onSubmit: (server: MCPServerInsertType) => void;
+	mode?: "create" | "edit";
+	initialData?: MCPServersType;
 }
 
 type ServerType = "sse" | "stdio";
@@ -74,19 +76,50 @@ export function MCPServerManager({
 	isOpen,
 	onClose,
 	onSubmit,
+	mode = "create",
+	initialData,
 }: MCPServerManagerProps) {
 	const { activeWorkspace } = useWorkspace();
-	const [serverType, setServerType] = useState<ServerType>("sse");
-	const [sseServer, setSseServer] = useState<SSEServerForm>(initialSSEServer);
-	const [stdioServer, setStdioServer] =
-		useState<StdioServerForm>(initialStdioServer);
+	const [serverType, setServerType] = useState<ServerType>(initialData?.type ?? "sse");
+	const [sseServer, setSseServer] = useState<SSEServerForm>(() => {
+		if (mode === "edit" && initialData?.type === "sse") {
+			return {
+				name: initialData.name,
+				description: initialData.description,
+				url: initialData.url ?? "",
+				headers: typeof initialData.headers === "string" ? JSON.parse(initialData.headers) : initialData.headers ?? {},
+			};
+		}
+		return initialSSEServer;
+	});
+	const [stdioServer, setStdioServer] = useState<StdioServerForm>(() => {
+		if (mode === "edit" && initialData?.type === "stdio") {
+			return {
+				name: initialData.name,
+				description: initialData.description,
+				command: initialData.command ?? "",
+				args: typeof initialData.args === "string" ? JSON.parse(initialData.args) : initialData.args ?? [],
+				env: typeof initialData.env === "string" ? JSON.parse(initialData.env) : initialData.env ?? {},
+			};
+		}
+		return initialStdioServer;
+	});
 	const [newHeader, setNewHeader] = useState<KeyValuePair>({
 		key: "",
 		value: "",
 	});
 	const [newArg, setNewArg] = useState("");
 	const [newEnv, setNewEnv] = useState<KeyValuePair>({ key: "", value: "" });
-	const [jsonInput, setJsonInput] = useState("");
+	const [jsonInput, setJsonInput] = useState(() => {
+		if (mode === "edit" && initialData?.type === "stdio") {
+			return JSON.stringify({
+				command: initialData.command ?? "",
+				args: typeof initialData.args === "string" ? JSON.parse(initialData.args) : initialData.args ?? [],
+				env: typeof initialData.env === "string" ? JSON.parse(initialData.env) : initialData.env ?? {},
+			}, null, 2);
+		}
+		return "";
+	});
 
 	const resetForms = () => {
 		setSseServer(initialSSEServer);
@@ -462,7 +495,7 @@ export function MCPServerManager({
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="sm:max-w-[600px]">
 				<DialogHeader>
-					<DialogTitle>Add MCP Server</DialogTitle>
+					<DialogTitle>{mode === "edit" ? "Edit MCP Server" : "Add MCP Server"}</DialogTitle>
 				</DialogHeader>
 				<div className="space-y-4">
 					{renderServerTypeSelector()}
