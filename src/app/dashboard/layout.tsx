@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/sidebar"
 import { authClient } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
+import { useWorkspace } from "@/hooks/use-workspace";
 
 export default function Layout({
   children,
@@ -15,9 +16,18 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
 	const { useSession } = authClient;
+  const { activeWorkspace, isLoading } = useWorkspace();
 	const { data: session, isPending } = useSession();
   if (!session?.user.id && !isPending) {
     return redirect("/");
+  }
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!activeWorkspace) {
+    return redirect("/workspaces/new");
   }
 
   return (
