@@ -1,6 +1,6 @@
-<a href="https://mcp.scira.ai">
-  <h1 align="center">Hanataba</h1>
-</a>
+<p align="center">
+  <img src="./docs/assets/hanataba.png" alt="Hanataba Logo" width="200" />
+</p>
 
 <p align="center">
   An open-source composio alternative powered by Model Context Protocol (MCP), built with Next.js and the AI SDK by Vercel.
@@ -19,6 +19,7 @@ https://www.loom.com/share/1f478bb921d34270b2fba4e965ab8f2e?sid=ac5fea41-b772-40
 ## Getting Started
 
 ```bash
+cp .env.sample .env
 docker compose up
 npx drizzle-kit migrate
 pnpm dev
