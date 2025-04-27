@@ -6,8 +6,7 @@
   An open-source composio alternative powered by Model Context Protocol (MCP), built with Next.js and the AI SDK by Vercel.
 </p>
 
-
-<video src="./docs/assets/demo.mp4" width="640" height="480" controls align="center"></video>
+![](./docs/assets/demo.gif)
 https://www.loom.com/share/1f478bb921d34270b2fba4e965ab8f2e?sid=ac5fea41-b772-405a-8b70-7803c4fe8b2a
 
 ## Features
