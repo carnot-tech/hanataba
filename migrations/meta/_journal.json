@@ -57,6 +57,13 @@
       "when": 1745697091843,
       "tag": "0007_lowly_squadron_sinister",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1745713339837,
+      "tag": "0008_superb_tombstone",
+      "breakpoints": true
     }
   ]
 }

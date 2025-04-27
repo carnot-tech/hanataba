@@ -71,7 +71,7 @@ export const mcpServersTable = pgTable("mcp_servers", {
 		.references(() => usersTable.id)
 		.notNull(),
 	workspaceId: text("workspace_id")
-		.references(() => workspacesTable.id)
+		.references(() => workspacesTable.id, { onDelete: "cascade" })
 		.notNull(),
 	name: text("name").notNull(),
 	description: text("description").notNull().default(""),
