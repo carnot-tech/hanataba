@@ -24,7 +24,7 @@ export const getTools = async (mcp: MCPServer) => {
 	switch (mcp.type) {
 		case "stdio": {
 			const env = mcp.env ?? {};
-			if (process.env.IS_VERCEL_FLUID === "development") {
+			if (process.env.IS_VERCEL_FLUID) {
 				env.npm_config_cache = "/tmp/.npm-cache";
 				env.npm_config_prefix = "/tmp/.npm-global";
 				env.npm_config_tmp = "/tmp";
